@@ -1,6 +1,6 @@
 {
-  "name": "lisk",
-  "version": "0.9.10",
+  "name": "caritas",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node app.js",
@@ -11,7 +11,6 @@
     "jsdoc": "jsdoc -c docs/conf.json --verbose --pedantic",
     "server-docs": "npm run jsdoc && http-server docs/jsdoc/"
   },
-  "author": "Lisk Foundation <admin@lisk.io>, lightcurve GmbH <admin@lightcurve.io>",
   "license": "GPL-3.0",
   "dependencies": {
     "async": "=2.1.4",
