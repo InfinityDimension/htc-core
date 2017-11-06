@@ -24,7 +24,7 @@
     },
     "redis": {
         "host": "127.0.0.1",
-        "port": 6380,
+        "port": 6379,
         "db": 0,
         "password": null
     },
@@ -32,7 +32,9 @@
         "enabled": true,
         "access": {
             "public": true,
-            "whiteList": ["127.0.0.1"]
+            "whiteList": [
+                "127.0.0.1"
+            ]
         },
         "options": {
             "limits": {
@@ -44,11 +46,13 @@
         }
     },
     "peers": {
-        "enabled": true,
-        "list": [{
-            "ip": "127.0.0.1",
-            "port": 9999
-        }],
+        "enabled": false,
+        "list": [
+            {
+                "ip": "127.0.0.1",
+                "port": 9999
+            }
+        ],
         "access": {
             "blackList": []
         },
@@ -198,7 +202,7 @@
     },
     "dapp": {
         "masterrequired": true,
-        "masterpassword": "",
+        "masterpassword": "rXfxn7nYqiq2",
         "autoexec": []
     },
     "nethash": "198f2b61a8eb95fbeed58b8216780b68f697f26b849acf00c8c93bb9b24f783d"

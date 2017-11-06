@@ -15,7 +15,7 @@
   "dependencies": {
     "async": "^2.5.0",
     "base-x": "^3.0.2",
-    "bignumber.js": "=4.0.0",
+    "bignumber.js":"^4.1.0",
     "body-parser": "^1.18.2",
     "bytebuffer": "^5.0.1",
     "change-case": "^3.0.1",
@@ -23,7 +23,7 @@
     "commander": "^2.11.0",
     "compression": "^1.7.1",
     "cors": "^2.8.4",
-    "decompress-zip": "LiskHQ/decompress-zip#f46b0a3",
+    "decompress-zip":"^0.3.0",
     "ejs": "^2.5.7",
     "express": "^4.16.2",
     "express-domain-middleware": "^0.1.0",
