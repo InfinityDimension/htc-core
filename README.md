@@ -22,7 +22,7 @@
 - Install PostgreSQL (version 9.6.2):
 
   ```
-  curl -sL "https://downloads.lisk.io/scripts/setup_postgresql.Linux" | bash -
+  sudo apt-get install -y postgresql postgresql-contrib libpq-dev
   sudo -u postgres createuser --createdb $USER
   createdb caritas_test
   sudo -u postgres psql -d caritas_test -c "alter user "$USER" with password 'password';"
