@@ -163,8 +163,7 @@ Transaction.prototype.multisign = function (keypair, trs) {
  * @return {string} id
  */
 Transaction.prototype.getId = function (trs) {
-    var hash = this.getHash(trs);
-    return hash.toString('hex');
+    return this.getHash(trs).toString('hex');
 };
 
 /**

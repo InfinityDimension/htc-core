@@ -440,13 +440,13 @@ Block.prototype.objectNormalize = function (block) {
  */
 Block.prototype.getId = function (block) {
     var hash = crypto.createHash('sha256').update(this.getBytes(block)).digest();
-    var temp = Buffer.alloc(8);
-    for (var i = 0; i < 8; i++) {
-        temp[i] = hash[7 - i];
-    }
-
-    var id = new bignum.fromBuffer(temp).toString();
-    return id;
+    // var temp = Buffer.alloc(8);
+    // for (var i = 0; i < 8; i++) {
+    //     temp[i] = hash[7 - i];
+    // }
+    //
+    // var id = new bignum.fromBuffer(temp).toString();
+    return hash.toString('hex');
 };
 
 /**
