@@ -46,7 +46,7 @@ Clone the Lisk repository using Git and initialize the modules.
 
 ```
 git clone https://github.com/CaritasChain/caritas.git
-cd lisk
+cd caritas
 npm install
 ```
 
