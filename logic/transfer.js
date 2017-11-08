@@ -12,7 +12,8 @@ var modules;
  * @classdesc Main transfer logic.
  */
 // Constructor
-function Transfer () {}
+function Transfer() {
+}
 
 // Public methods
 /**
@@ -21,10 +22,10 @@ function Transfer () {}
  * @param {Rounds} rounds
  */
 Transfer.prototype.bind = function (accounts, rounds) {
-	modules = {
-		accounts: accounts,
-		rounds: rounds,
-	};
+    modules = {
+        accounts: accounts,
+        rounds: rounds,
+    };
 };
 
 /**
@@ -34,10 +35,10 @@ Transfer.prototype.bind = function (accounts, rounds) {
  * @return {transaction} trs with assigned data
  */
 Transfer.prototype.create = function (data, trs) {
-	trs.recipientId = data.recipientId;
-	trs.amount = data.amount;
+    trs.recipientId = data.recipientId;
+    trs.amount = data.amount;
 
-	return trs;
+    return trs;
 };
 /**
  * Returns send fees from constants.
@@ -46,7 +47,7 @@ Transfer.prototype.create = function (data, trs) {
  * @return {number} fee
  */
 Transfer.prototype.calculateFee = function (trs, sender) {
-	return constants.fees.send;
+    return constants.fees.send;
 };
 
 /**
@@ -57,15 +58,15 @@ Transfer.prototype.calculateFee = function (trs, sender) {
  * @return {setImmediateCallback} errors | trs
  */
 Transfer.prototype.verify = function (trs, sender, cb) {
-	if (!trs.recipientId) {
-		return setImmediate(cb, 'Missing recipient');
-	}
+    if (!trs.recipientId) {
+        return setImmediate(cb, 'Missing recipient');
+    }
 
-	if (trs.amount <= 0) {
-		return setImmediate(cb, 'Invalid transaction amount');
-	}
+    if (trs.amount <= 0) {
+        return setImmediate(cb, 'Invalid transaction amount');
+    }
 
-	return setImmediate(cb, null, trs);
+    return setImmediate(cb, null, trs);
 };
 
 /**
@@ -75,7 +76,7 @@ Transfer.prototype.verify = function (trs, sender, cb) {
  * @return {setImmediateCallback} cb, null, trs
  */
 Transfer.prototype.process = function (trs, sender, cb) {
-	return setImmediate(cb, null, trs);
+    return setImmediate(cb, null, trs);
 };
 
 /**
@@ -83,7 +84,7 @@ Transfer.prototype.process = function (trs, sender, cb) {
  * @return {null}
  */
 Transfer.prototype.getBytes = function (trs) {
-	return null;
+    return null;
 };
 
 /**
@@ -99,21 +100,21 @@ Transfer.prototype.getBytes = function (trs) {
  * @return {setImmediateCallback} error, cb
  */
 Transfer.prototype.apply = function (trs, block, sender, cb) {
-	modules.accounts.setAccountAndGet({address: trs.recipientId}, function (err, recipient) {
-		if (err) {
-			return setImmediate(cb, err);
-		}
+    modules.accounts.setAccountAndGet({address: trs.recipientId}, function (err, recipient) {
+        if (err) {
+            return setImmediate(cb, err);
+        }
 
-		modules.accounts.mergeAccountAndGet({
-			address: trs.recipientId,
-			balance: trs.amount,
-			u_balance: trs.amount,
-			blockId: block.id,
-			round: modules.rounds.calc(block.height)
-		}, function (err) {
-			return setImmediate(cb, err);
-		});
-	});
+        modules.accounts.mergeAccountAndGet({
+            address: trs.recipientId,
+            balance: trs.amount,
+            u_balance: trs.amount,
+            blockId: block.id,
+            round: modules.rounds.calc(block.height)
+        }, function (err) {
+            return setImmediate(cb, err);
+        });
+    });
 };
 
 /**
@@ -129,21 +130,21 @@ Transfer.prototype.apply = function (trs, block, sender, cb) {
  * @return {setImmediateCallback} error, cb
  */
 Transfer.prototype.undo = function (trs, block, sender, cb) {
-	modules.accounts.setAccountAndGet({address: trs.recipientId}, function (err, recipient) {
-		if (err) {
-			return setImmediate(cb, err);
-		}
+    modules.accounts.setAccountAndGet({address: trs.recipientId}, function (err, recipient) {
+        if (err) {
+            return setImmediate(cb, err);
+        }
 
-		modules.accounts.mergeAccountAndGet({
-			address: trs.recipientId,
-			balance: -trs.amount,
-			u_balance: -trs.amount,
-			blockId: block.id,
-			round: modules.rounds.calc(block.height)
-		}, function (err) {
-			return setImmediate(cb, err);
-		});
-	});
+        modules.accounts.mergeAccountAndGet({
+            address: trs.recipientId,
+            balance: -trs.amount,
+            u_balance: -trs.amount,
+            blockId: block.id,
+            round: modules.rounds.calc(block.height)
+        }, function (err) {
+            return setImmediate(cb, err);
+        });
+    });
 };
 
 /**
@@ -153,7 +154,7 @@ Transfer.prototype.undo = function (trs, block, sender, cb) {
  * @return {setImmediateCallback} cb
  */
 Transfer.prototype.applyUnconfirmed = function (trs, sender, cb) {
-	return setImmediate(cb);
+    return setImmediate(cb);
 };
 
 /**
@@ -163,17 +164,17 @@ Transfer.prototype.applyUnconfirmed = function (trs, sender, cb) {
  * @return {setImmediateCallback} cb
  */
 Transfer.prototype.undoUnconfirmed = function (trs, sender, cb) {
-	return setImmediate(cb);
+    return setImmediate(cb);
 };
 
 /**
- * Deletes blockId from transaction 
+ * Deletes blockId from transaction
  * @param {transaction} trs
  * @return {transaction}
  */
 Transfer.prototype.objectNormalize = function (trs) {
-	delete trs.blockId;
-	return trs;
+    delete trs.blockId;
+    return trs;
 };
 
 /**
@@ -181,7 +182,7 @@ Transfer.prototype.objectNormalize = function (trs) {
  * @return {null}
  */
 Transfer.prototype.dbRead = function (raw) {
-	return null;
+    return null;
 };
 
 /**
@@ -189,25 +190,25 @@ Transfer.prototype.dbRead = function (raw) {
  * @return {null}
  */
 Transfer.prototype.dbSave = function (trs) {
-	return null;
+    return null;
 };
 
 /**
  * Checks sender multisignatures and transaction signatures.
  * @param {transaction} trs
  * @param {account} sender
- * @return {boolean} True if transaction signatures greather than 
+ * @return {boolean} True if transaction signatures greather than
  * sender multimin or there are not sender multisignatures.
  */
 Transfer.prototype.ready = function (trs, sender) {
-	if (Array.isArray(sender.multisignatures) && sender.multisignatures.length) {
-		if (!Array.isArray(trs.signatures)) {
-			return false;
-		}
-		return trs.signatures.length >= sender.multimin;
-	} else {
-		return true;
-	}
+    if (Array.isArray(sender.multisignatures) && sender.multisignatures.length) {
+        if (!Array.isArray(trs.signatures)) {
+            return false;
+        }
+        return trs.signatures.length >= sender.multimin;
+    } else {
+        return true;
+    }
 };
 
 // Export
