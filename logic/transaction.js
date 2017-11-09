@@ -1002,7 +1002,7 @@ Transaction.prototype.schema = {
             type: 'string',
             format: 'id',
             minLength: 1,
-            maxLength: 20
+            maxLength: 64
         },
         height: {
             type: 'integer'
@@ -1011,7 +1011,7 @@ Transaction.prototype.schema = {
             type: 'string',
             format: 'id',
             minLength: 1,
-            maxLength: 20
+            maxLength: 64
         },
         type: {
             type: 'integer'
@@ -1031,13 +1031,13 @@ Transaction.prototype.schema = {
             type: 'string',
             format: 'address',
             minLength: 1,
-            maxLength: 22
+            maxLength: 50
         },
         recipientId: {
             type: 'string',
             format: 'address',
             minLength: 1,
-            maxLength: 22
+            maxLength: 50
         },
         amount: {
             type: 'integer',

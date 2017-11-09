@@ -66,7 +66,7 @@ module.exports = {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             }
         },
         required: ['id']
@@ -79,7 +79,7 @@ module.exports = {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             category: {
                 type: 'string',
@@ -131,7 +131,7 @@ module.exports = {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             master: {
                 type: 'string',
@@ -167,7 +167,7 @@ module.exports = {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             multisigAccountPublicKey: {
                 type: 'string',
@@ -205,13 +205,13 @@ module.exports = {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             transactionId: {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             multisigAccountPublicKey: {
                 type: 'string',
@@ -249,7 +249,7 @@ module.exports = {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             master: {
                 type: 'string',
@@ -266,7 +266,7 @@ module.exports = {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             master: {
                 type: 'string',
@@ -283,7 +283,7 @@ module.exports = {
                 type: 'string',
                 format: 'id',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             master: {
                 type: 'string',

@@ -51,15 +51,8 @@ __private.blockReward = new BlockReward();
  * @return {address} address
  */
 __private.getAddressByPublicKey = function (publicKey) {
-    var publicKeyHash = crypto.createHash('sha256').update(publicKey, 'hex').digest();
-    var temp = Buffer.alloc(8);
-
-    for (var i = 0; i < 8; i++) {
-        temp[i] = publicKeyHash[7 - i];
-    }
-
-    var address = bignum.fromBuffer(temp).toString() + 'L';
-    return address;
+    var addressHelp=require('../helpers/address');
+    return addressHelp.generateBase58Address(publicKey);
 };
 
 // Public methods
@@ -183,7 +176,8 @@ Block.prototype.getBytes = function (block) {
         bb.writeInt(block.timestamp);
 
         if (block.previousBlock) {
-            var pb = new bignum(block.previousBlock).toBuffer({size: '8'});
+            // var pb = new bignum(block.previousBlock).toBuffer({size: '8'});
+            var pb = Buffer.from(block.previousBlock);
 
             for (i = 0; i < 8; i++) {
                 bb.writeByte(pb[i]);
@@ -339,7 +333,7 @@ Block.prototype.schema = {
             type: 'string',
             format: 'id',
             minLength: 1,
-            maxLength: 20
+            maxLength: 64
         },
         height: {
             type: 'integer'
@@ -366,7 +360,7 @@ Block.prototype.schema = {
             type: 'string',
             format: 'id',
             minLength: 1,
-            maxLength: 20
+            maxLength: 64
         },
         timestamp: {
             type: 'integer'

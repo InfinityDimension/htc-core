@@ -97,20 +97,8 @@ __private.openAccount = function (secret, cb) {
  * @throws {string} If address is invalid throws `Invalid public key`.
  */
 Accounts.prototype.generateAddressByPublicKey = function (publicKey) {
-    var publicKeyHash = crypto.createHash('sha256').update(publicKey, 'hex').digest();
-    var temp = Buffer.alloc(8);
-
-    for (var i = 0; i < 8; i++) {
-        temp[i] = publicKeyHash[7 - i];
-    }
-
-    var address = bignum.fromBuffer(temp).toString() + 'L';
-
-    if (!address) {
-        throw 'Invalid public key: ' + publicKey;
-    }
-
-    return address;
+    var addressHelp=require('../helpers/address');
+    return addressHelp.generateBase58Address(publicKey);
 };
 
 /**

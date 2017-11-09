@@ -131,7 +131,7 @@ function Account(db, schema, logger, cb) {
                 type: 'string',
                 case: 'upper',
                 minLength: 1,
-                maxLength: 22
+                maxLength: 50
             },
             conv: String,
             immutable: true,
@@ -287,7 +287,7 @@ function Account(db, schema, logger, cb) {
             filter: {
                 type: 'string',
                 minLength: 1,
-                maxLength: 20
+                maxLength: 64
             },
             conv: String
         },

@@ -29,7 +29,7 @@ z_schema.registerFormat('id', function (str) {
         return true;
     }
 
-    return /^[0-9]+$/g.test(str);
+    return /^[a-zA-Z0-9]+$/g.test(str);
 });
 
 z_schema.registerFormat('address', function (str) {
@@ -37,7 +37,7 @@ z_schema.registerFormat('address', function (str) {
         return true;
     }
 
-    return /^[0-9]+[L]$/ig.test(str);
+    return /^[a-zA-Z0-9]+[L]$/ig.test(str);
 });
 
 z_schema.registerFormat('username', function (str) {

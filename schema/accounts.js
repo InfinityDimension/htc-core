@@ -21,7 +21,7 @@ module.exports = {
                 type: 'string',
                 format: 'address',
                 minLength: 1,
-                maxLength: 22
+                maxLength: 50
             }
         },
         required: ['address']
@@ -34,7 +34,7 @@ module.exports = {
                 type: 'string',
                 format: 'address',
                 minLength: 1,
-                maxLength: 22
+                maxLength: 50
             }
         },
         required: ['address']
@@ -59,7 +59,7 @@ module.exports = {
                 type: 'string',
                 format: 'address',
                 minLength: 1,
-                maxLength: 22
+                maxLength: 50
             }
         },
         required: ['address']
@@ -92,7 +92,7 @@ module.exports = {
                 type: 'string',
                 format: 'address',
                 minLength: 1,
-                maxLength: 22
+                maxLength: 50
             },
             publicKey: {
                 type: 'string',
