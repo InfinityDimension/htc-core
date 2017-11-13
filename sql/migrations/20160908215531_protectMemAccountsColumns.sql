@@ -9,6 +9,7 @@ DROP TRIGGER IF EXISTS protect_mem_accounts ON "mem_accounts";
 DROP FUNCTION IF EXISTS revert_mem_account();
 
 CREATE FUNCTION revert_mem_account() RETURNS TRIGGER LANGUAGE PLPGSQL AS $$
+
 BEGIN
 
   -- As per columns marked as immutable within application layer (logic/account.js).
@@ -19,14 +20,14 @@ BEGIN
     NEW."address" = OLD."address";
   END IF;
 
-  -- Revert any change of u_username
-  IF NEW."u_username" <> OLD."u_username" AND OLD."u_username" IS NOT NULL THEN
+  -- Revert any change of u_username except of setting to null (see pop last block procedures)
+  IF NEW."u_username" <> OLD."u_username" AND NEW."u_username" IS NOT NULL AND OLD."u_username" IS NOT NULL THEN
     RAISE WARNING 'Reverting change of u_username from % to %', OLD."u_username", NEW."u_username";
     NEW."u_username" = OLD."u_username";
   END IF;
 
-  -- Revert any change of username
-  IF NEW."username" <> OLD."username" AND OLD."username" IS NOT NULL THEN
+  -- Revert any change of username except of setting to null (see pop last block procedures)
+  IF NEW."username" <> OLD."username" AND NEW."username" IS NOT NULL AND OLD."username" IS NOT NULL THEN
     RAISE WARNING 'Reverting change of username from % to %', OLD."username", NEW."username";
     NEW."username" = OLD."username";
   END IF;

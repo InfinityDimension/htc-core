@@ -83,27 +83,4 @@ LEFT OUTER JOIN dapps AS dapp ON dapp."transactionId" = t."id"
 LEFT OUTER JOIN intransfer AS it ON it."transactionId" = t."id"
 LEFT OUTER JOIN outtransfer AS ot ON ot."transactionId" = t."id";
 
-DROP VIEW IF EXISTS trs_list;
-
-CREATE VIEW trs_list AS
-
-SELECT t."id" AS "t_id",
-       b."height" AS "b_height",
-       t."blockId" AS "t_blockId",
-       t."type" AS "t_type",
-       t."timestamp" AS "t_timestamp",
-       ENCODE(t."senderPublicKey", 'hex') AS "t_senderPublicKey",
-       t."senderId" AS "t_senderId",
-       t."recipientId" AS "t_recipientId",
-       t."amount" AS "t_amount",
-       t."fee" AS "t_fee",
-       ENCODE(t."signature", 'hex') AS "t_signature",
-       ENCODE(t."signSignature", 'hex') AS "t_SignSignature",
-       t."signatures" AS "t_signatures",
-       (SELECT MAX("height") + 1 FROM blocks) - b."height" AS "confirmations"
-
-FROM trs t
-
-INNER JOIN blocks b ON t."blockId" = b."id";
-
 COMMIT;

@@ -114,6 +114,8 @@ CREATE TABLE IF NOT EXISTS "peers"(
   "state" SMALLINT NOT NULL,
   "os" VARCHAR(64),
   "version" VARCHAR(11),
+  "broadhash" bytea,
+  "height" INT,
   "clock" BIGINT
 );
 
@@ -151,5 +153,7 @@ CREATE INDEX IF NOT EXISTS "delegates_trs_id" ON "delegates"("transactionId");
 CREATE INDEX IF NOT EXISTS "multisignatures_trs_id" ON "multisignatures"("transactionId");
 CREATE INDEX IF NOT EXISTS "dapps_trs_id" ON "dapps"("transactionId");
 CREATE INDEX IF NOT EXISTS "dapps_name" ON "dapps"("name");
+CREATE INDEX IF NOT EXISTS "peers_broadhash" ON "peers"("broadhash");
+CREATE INDEX IF NOT EXISTS "peers_height" ON "peers"("height");
 
 COMMIT;

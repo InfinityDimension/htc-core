@@ -22,17 +22,18 @@ CREATE TABLE IF NOT EXISTS "mem_accounts"(
   "u_delegates" TEXT,
   "multisignatures" TEXT,
   "u_multisignatures" TEXT,
-  "multimin" BIGINT DEFAULT 0,
-  "u_multimin" BIGINT DEFAULT 0,
-  "multilifetime" BIGINT DEFAULT 0,
-  "u_multilifetime" BIGINT DEFAULT 0,
+  "multimin" SMALLINT DEFAULT 0,
+  "u_multimin" SMALLINT DEFAULT 0,
+  "multilifetime" SMALLINT DEFAULT 0,
+  "u_multilifetime" SMALLINT DEFAULT 0,
   "blockId" VARCHAR(64),
   "nameexist" SMALLINT DEFAULT 0,
   "u_nameexist" SMALLINT DEFAULT 0,
   "producedblocks" int DEFAULT 0,
   "missedblocks" int DEFAULT 0,
   "fees" BIGINT DEFAULT 0,
-  "rewards" BIGINT DEFAULT 0
+  "rewards" BIGINT DEFAULT 0,
+  "virgin" SMALLINT DEFAULT 1
 );
 
 CREATE INDEX IF NOT EXISTS "mem_accounts_balance" ON "mem_accounts"("balance");
@@ -68,5 +69,20 @@ CREATE TABLE IF NOT EXISTS "mem_accounts2u_multisignatures"(
   "dependentId" VARCHAR(64) NOT NULL,
   FOREIGN KEY ("accountId") REFERENCES mem_accounts("address") ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS "mem_round_address" ON "mem_round"("address");
+
+CREATE INDEX IF NOT EXISTS "mem_round_round" ON "mem_round"("round");
+
+CREATE INDEX IF NOT EXISTS "mem_accounts2delegates_accountId" ON "mem_accounts2delegates"("accountId");
+
+CREATE INDEX IF NOT EXISTS "mem_accounts2u_delegates_accountId" ON "mem_accounts2u_delegates"("accountId");
+
+CREATE INDEX IF NOT EXISTS "mem_accounts2multisignatures_accountId" ON "mem_accounts2multisignatures"("accountId");
+
+CREATE INDEX IF NOT EXISTS "mem_accounts2u_multisignatures_accountId" ON "mem_accounts2u_multisignatures"("accountId");
+
+-- Add 'mem_accounts2delegates_depId' index for fast delegates voters counting
+CREATE INDEX IF NOT EXISTS "mem_accounts2delegates_depId" ON mem_accounts2delegates("dependentId");
 
 COMMIT;

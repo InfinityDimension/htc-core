@@ -4,8 +4,6 @@
 
 BEGIN;
 
-ALTER TABLE "mem_accounts" ADD COLUMN "virgin" SMALLINT DEFAULT 1;
-
 -- Delete accounts which have never received or sent funds
 -- e.g. Created using /api/accounts/open
 DELETE FROM "mem_accounts"
