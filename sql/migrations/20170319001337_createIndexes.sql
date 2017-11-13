@@ -7,9 +7,6 @@ BEGIN;
 -- Add 'mem_accounts_address' index for 'address'
 CREATE INDEX IF NOT EXISTS "mem_accounts_address" ON "mem_accounts" ("address");
 
--- Add 'mem_accounts_address_upper' index for upper case 'address'
-CREATE INDEX IF NOT EXISTS "mem_accounts_address_upper" ON "mem_accounts" (UPPER("address"));
-
 -- Add 'mem_accounts_is_delegate' index for 'isDelegate'
 CREATE INDEX IF NOT EXISTS "mem_accounts_is_delegate" ON "mem_accounts" ("isDelegate");
 

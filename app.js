@@ -1,25 +1,7 @@
 'use strict';
-/**
- * A node-style callback as used by {@link logic} and {@link modules}.
- * @see {@link https://nodejs.org/api/errors.html#errors_node_js_style_callbacks}
- * @callback nodeStyleCallback
- * @param {?Error} error - Error, if any, otherwise `null`.
- * @param {Data} data - Data, if there hasn't been an error.
- */
-/**
- * A triggered by setImmediate callback as used by {@link logic}, {@link modules} and {@link helpers}.
- * Parameters formats: (cb, error, data), (cb, error), (cb).
- * @see {@link https://nodejs.org/api/timers.html#timers_setimmediate_callback_args}
- * @callback setImmediateCallback
- * @param {function} cb - Callback function.
- * @param {?Error} [error] - Error, if any, otherwise `null`.
- * @param {Data} [data] - Data, if there hasn't been an error and the function should return data.
- */
 
 /**
  * Main entry point.
- * Loads the lisk modules, the lisk api and run the express server as Domain master.
- * CLI options available.
  * @module app
  */
 
@@ -111,14 +93,6 @@ if (process.env.NODE_ENV === 'test') {
 // Define top endpoint availability
 process.env.TOP = appConfig.topAccounts;
 
-/**
- * The config object to handle lisk modules and lisk api.
- * It loads `modules` and `api` folders content.
- * Also contains db configuration from config.json.
- * @property {object} db - Config values for database.
- * @property {object} modules - `modules` folder content.
- * @property {object} api - `api/http` folder content.
- */
 var config = {
     db: appConfig.db,
     cache: appConfig.redis,
@@ -157,16 +131,15 @@ var config = {
 };
 
 /**
- * Logger holder so we can log with custom functionality.
- * The Object is initialized here and pass to others as parameter.
- * @property {object} - Logger instance.
+ * 新建日志处理对象
+ * @type {module.exports|exports}
  */
 var logger = new Logger({
     echo: appConfig.consoleLogLevel, errorLevel: appConfig.fileLogLevel,
     filename: appConfig.logFileName
 });
 
-// Trying to get last git commit
+// 获取git 最新提交代码
 try {
     lastCommit = git.getLastCommit();
 } catch (err) {
@@ -265,8 +238,8 @@ d.run(function () {
          */
         network: ['config', function (scope, cb) {
             var express = require('express');
-            var compression = require('compression');
-            var cors = require('cors');
+            var compression = require('compression');  //压缩中间件
+            var cors = require('cors');  //跨域相关中间件
             var app = express();
 
             if (appConfig.coverage) {

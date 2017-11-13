@@ -129,13 +129,13 @@ function Account(db, schema, logger, cb) {
             filter: {
                 required: true,
                 type: 'string',
-                case: 'upper',
+                // case: 'upper',
                 minLength: 1,
                 maxLength: 50
             },
             conv: String,
-            immutable: true,
-            expression: 'UPPER("address")'
+            immutable: true
+            // expression: 'UPPER("address")'
         },
         {
             name: 'publicKey',
@@ -521,7 +521,7 @@ Account.prototype.toDB = function (raw) {
     });
 
     // Normalize address
-    raw.address = String(raw.address).toUpperCase();
+    // raw.address = String(raw.address).toUpperCase();
 
     return raw;
 };
@@ -589,11 +589,11 @@ Account.prototype.getAll = function (filter, fields, cb) {
     }
     delete filter.sort;
 
-    if (typeof filter.address === 'string') {
-        filter.address = {
-            $upper: ['address', filter.address]
-        };
-    }
+    // if (typeof filter.address === 'string') {
+    //     filter.address = {
+    //         $upper: ['address', filter.address]
+    //     };
+    // }
 
     var sql = jsonSql.build({
         type: 'select',
@@ -626,7 +626,7 @@ Account.prototype.set = function (address, fields, cb) {
     this.verifyPublicKey(fields.publicKey);
 
     // Normalize address
-    address = String(address).toUpperCase();
+    // address = String(address).toUpperCase();
     fields.address = address;
 
     var sql = jsonSql.build({
@@ -661,7 +661,7 @@ Account.prototype.merge = function (address, diff, cb) {
     this.verifyPublicKey(diff.publicKey);
 
     // Normalize address
-    address = String(address).toUpperCase();
+    // address = String(address).toUpperCase();
 
     this.editable.forEach(function (value) {
         var val, i;
