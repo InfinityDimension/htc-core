@@ -1,6 +1,6 @@
 'use strict';
 
-var strftime = require('strftime').utc();
+var strftime = require('strftime').localize();
 var fs = require('fs');
 var util = require('util');
 require('colors');
