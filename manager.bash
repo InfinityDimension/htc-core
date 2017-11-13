@@ -2,7 +2,7 @@
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
-version="1.0.0"
+version="0.0.1"
 
 cd "$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 root_path=$(pwd)
@@ -92,7 +92,7 @@ ntp_checks() {
         sudo ntpdate pool.ntp.org &>> $logfile
         sudo service ntp start &>> $logfile
         if ! sudo pgrep -x "ntpd" > /dev/null; then
-          echo -e "CARITAS requires NTP running. Please check /etc/ntp.conf and correct any issues. Exiting."
+          echo -e "Caritas requires NTP running. Please check /etc/ntp.conf and correct any issues. Exiting."
           exit 1
         echo -e "done.\n"
         fi # if sudo pgrep
@@ -205,8 +205,12 @@ install_node_npm() {
     sudo npm install grunt-cli -g &>> $logfile || { echo "Could not install grunt-cli. Exiting." && exit 1; }
     echo -e "done.\n" && echo -n "Installing bower... "
     sudo npm install bower -g &>> $logfile || { echo "Could not install bower. Exiting." && exit 1; }
-    echo -e "done.\n" && echo -n "Installing process management software... "
+    echo -e "done.\n" && echo -n "Installing forever... "
     sudo npm install forever -g &>> $logfile || { echo "Could not install process management software(forever). Exiting." && exit 1; }
+    echo -e "done.\n" && echo -n "Installing pm2... "
+    sudo npm install pm2 -g &>> $logfile || { echo "Could not install process management software(forever). Exiting." && exit 1; }
+    echo -e "done.\n" && echo -n "Installing node-gyp... "
+    sudo npm install node-gyp -g &>> $logfile || { echo "Could not install process management software(forever). Exiting." && exit 1; }
     echo -e "done.\n"
 
     return 0;
@@ -224,18 +228,8 @@ install_caritas() {
 install_webui() {
 
     echo -n "Installing Caritas WebUi... "
-    git clone https://github.com/ShiftNrg/shift-wallet &>> $logfile || { echo -n "Could not clone git wallet source. Exiting." && exit 1; }
-
-    if [[ -d "public" ]]; then
-        rm -rf public/
-    fi
-
-    if [[ -d "shift-wallet" ]]; then
-        mv caritas-wallet public
-    else
-        echo "Could not find installation directory for CARITAS web wallet. Install the web wallet manually."
-        exit 1;
-    fi
+    git submodule init
+    git submodule update &>> $logfile || { echo -n "Could not clone git wallet source. Exiting." && exit 1; }
 
     cd public && npm install &>> $logfile || { echo -n "Could not install web wallet node modules. Exiting." && exit 1; }
 
@@ -258,7 +252,7 @@ install_webui() {
 update_manager() {
 
     echo -n "Updating Caritas Manager ... "
-    wget -q -O manager.bash https://raw.githubusercontent.com/ShiftNrg/shift/$GIT_BRANCH/shift_manager.bash
+    wget -q -O manager.bash https://github.com/CaritasChain/caritas/$GIT_BRANCH/manager.bash
     echo "done."
 
     return 0;
@@ -335,7 +329,7 @@ start_caritas() {
     echo -n "Starting Caritas... "
     forever_exists=$(whereis forever | awk {'print $2'})
     if [[ ! -z $forever_exists ]]; then
-        $forever_exists start -o $root_path/logs/shift_console.log -e $root_path/logs/shift_err.log app.js -c "$CARITAS_CONFIG" &>> $logfile || \
+        $forever_exists start -o $root_path/logs/caritas_console.log -e $root_path/logs/caritas_err.log app.js -c "$CARITAS_CONFIG" &>> $logfile || \
         { echo -e "\nCould not start Caritas." && exit 1; }
     fi
 
