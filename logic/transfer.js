@@ -1,6 +1,7 @@
 'use strict';
 
 var constants = require('../helpers/constants.js');
+var bignumber=require('bignumber.js');
 
 // Private fields
 var modules;
