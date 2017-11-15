@@ -27,7 +27,7 @@ module.exports = {
     maxRequests: 10000 * 12,
     maxSharedTxs: 100,
     maxSignaturesLength: 196 * 256,
-    maxTxsPerBlock: 25,
+    maxTxsPerBlock: 500,
     minBroadhashConsensus: 51,
     nethashes: [
         // Mainnet
