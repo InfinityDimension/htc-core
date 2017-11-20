@@ -164,9 +164,6 @@ d.run(function () {
         /**
          * Loads `payloadHash` and generate dapp password if it is empty and required.
          * Then updates config.json with new random  password.
-         * @method config
-         * @param {nodeStyleCallback} cb - Callback function with the mutated `appConfig`.
-         * @throws {Error} If failed to assign nethash from genesis block.
          */
         config: function (cb) {
             try {
@@ -207,8 +204,6 @@ d.run(function () {
 
         /**
          * Returns hash of last git commit.
-         * @method lastCommit
-         * @param {nodeStyleCallback} cb - Callback function with Hash of last git commit.
          */
         lastCommit: function (cb) {
             cb(null, lastCommit);
@@ -230,11 +225,6 @@ d.run(function () {
 
         /**
          * Once config is completed, creates app, http & https servers & sockets with express.
-         * @method network
-         * @param {object} scope - The results from current execution,
-         * at leats will contain the required elements.
-         * @param {nodeStyleCallback} cb - Callback function with created Object:
-         * `{express, app, server, io, https, https_io}`.
          */
         network: ['config', function (scope, cb) {
             var express = require('express');
@@ -313,10 +303,6 @@ d.run(function () {
         /**
          * Once config, public, genesisblock, logger, build and network are completed,
          * adds configuration to `network.app`.
-         * @method connect
-         * @param {object} scope - The results from current execution,
-         * at leats will contain the required elements.
-         * @param {function} cb - Callback function.
          */
         connect: ['config', 'public', 'genesisblock', 'logger', 'build', 'network', function (scope, cb) {
             var path = require('path');
@@ -471,15 +457,7 @@ d.run(function () {
                 }]
             }, cb);
         }],
-        /**
-         * Once network, connect, config, logger, bus, sequence,
-         * dbSequence, balancesSequence, db and logic are completed,
-         * loads modules from `modules` folder using `config.modules`.
-         * @method modules
-         * @param {object} scope - The results from current execution,
-         * at leats will contain the required elements.
-         * @param {nodeStyleCallback} cb - Callback function with resulted load.
-         */
+
         modules: ['network', 'connect', 'config', 'logger', 'bus', 'sequence', 'dbSequence', 'balancesSequence', 'db', 'logic', 'cache', function (scope, cb) {
 
             var tasks = {};
@@ -506,14 +484,6 @@ d.run(function () {
             });
         }],
 
-        /**
-         * Loads api from `api` folder using `config.api`, once modules, logger and
-         * network are completed.
-         * @method api
-         * @param {object} scope - The results from current execution,
-         * at leats will contain the required elements.
-         * @param {function} cb - Callback function.
-         */
         api: ['modules', 'logger', 'network', function (scope, cb) {
             Object.keys(config.api).forEach(function (moduleName) {
                 Object.keys(config.api[moduleName]).forEach(function (protocol) {
@@ -541,10 +511,6 @@ d.run(function () {
         /**
          * Once 'ready' is completed, binds and listens for connections on the
          * specified host and port for `scope.network.server`.
-         * @method listen
-         * @param {object} scope - The results from current execution,
-         * at leats will contain the required elements.
-         * @param {nodeStyleCallback} cb - Callback function with `scope.network`.
          */
         listen: ['ready', function (scope, cb) {
             scope.network.server.listen(scope.config.port, scope.config.address, function (err) {
@@ -571,41 +537,11 @@ d.run(function () {
         } else {
             /**
              * Handles app instance (acts as global variable, passed as parameter).
-             * @global
-             * @typedef {Object} scope
-             * @property {Object} api - Undefined.
-             * @property {undefined} balancesSequence - Sequence function, sequence Array.
-             * @property {string} build - Empty.
-             * @property {Object} bus - Message function, bus constructor.
-             * @property {Object} config - Configuration.
-             * @property {undefined} connect - Undefined.
-             * @property {Object} db - Database constructor, database functions.
-             * @property {function} dbSequence - Database function.
-             * @property {Object} ed - Crypto functions from lisk node-sodium.
-             * @property {Object} genesisblock - Block information.
-             * @property {string} lastCommit - Hash transaction.
-             * @property {Object} listen - Network information.
-             * @property {Object} logger - Log functions.
-             * @property {Object} logic - several logic functions and objects.
-             * @property {Object} modules - Several modules functions.
-             * @property {Object} network - Several network functions.
-             * @property {string} nonce
-             * @property {string} public - Path to lisk public folder.
-             * @property {undefined} ready
-             * @property {Object} schema - ZSchema with objects.
-             * @property {Object} sequence - Sequence function, sequence Array.
              * @todo logic repeats: bus, ed, genesisblock, logger, schema.
              * @todo description for nonce and ready
              */
             scope.logger.info('Modules ready and launched');
-            /**
-             * Event reporting a cleanup.
-             * @event cleanup
-             */
-            /**
-             * Receives a 'cleanup' signal and cleans all modules.
-             * @listens cleanup
-             */
+
             process.once('cleanup', function () {
                 scope.logger.info('Cleaning up...');
                 async.eachSeries(modules, function (module, cb) {
@@ -624,71 +560,23 @@ d.run(function () {
                 });
             });
 
-            /**
-             * Event reporting a SIGTERM.
-             * @event SIGTERM
-             */
-            /**
-             * Receives a 'SIGTERM' signal and emits a cleanup.
-             * @listens SIGTERM
-             */
             process.once('SIGTERM', function () {
-                /**
-                 * emits cleanup once 'SIGTERM'.
-                 * @emits cleanup
-                 */
                 process.emit('cleanup');
             });
 
-            /**
-             * Event reporting an exit.
-             * @event exit
-             */
-            /**
-             * Receives an 'exit' signal and emits a cleanup.
-             * @listens exit
-             */
             process.once('exit', function () {
-                /**
-                 * emits cleanup once 'exit'.
-                 * @emits cleanup
-                 */
                 process.emit('cleanup');
             });
 
-            /**
-             * Event reporting a SIGINT.
-             * @event SIGINT
-             */
-            /**
-             * Receives a 'SIGINT' signal and emits a cleanup.
-             * @listens SIGINT
-             */
             process.once('SIGINT', function () {
-                /**
-                 * emits cleanup once 'SIGINT'.
-                 * @emits cleanup
-                 */
                 process.emit('cleanup');
             });
         }
     });
 });
 
-/**
- * Event reporting an uncaughtException.
- * @event uncaughtException
- */
-/**
- * Receives a 'uncaughtException' signal and emits a cleanup.
- * @listens uncaughtException
- */
 process.on('uncaughtException', function (err) {
     // Handle error safely
     logger.fatal('System error', {message: err.message, stack: err.stack});
-    /**
-     * emits cleanup once 'uncaughtException'.
-     * @emits cleanup
-     */
     process.emit('cleanup');
 });

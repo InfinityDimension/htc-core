@@ -1,7 +1,6 @@
 'use strict';
 
-const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-const bs58 = require('base-x')(BASE58);
+const bs58 = require('bs58');
 const crypto = require('crypto');
 
 module.exports = {
