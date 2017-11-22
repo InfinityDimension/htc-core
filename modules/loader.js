@@ -309,18 +309,6 @@ __private.loadTransactions = function (cb) {
  *  - Calls block to load block. When blockchain ready emits a bus message.
  * Detects orphaned blocks in `mem_accounts` and gets delegates.
  * Loads last block and emits a bus message blockchain is ready.
- * @private
- * @implements {library.db.task}
- * @implements {modules.rounds.calc}
- * @implements {library.bus.message}
- * @implements {library.logic.account.removeTables}
- * @implements {library.logic.account.createTables}
- * @implements {async.until}
- * @implements {modules.blocks.loadBlocksOffset}
- * @implements {modules.blocks.deleteAfterBlock}
- * @implements {modules.blocks.loadLastBlock}
- * @emits exit
- * @throws {string} When fails to match genesis block with database
  */
 __private.loadBlockChain = function () {
     var offset = 0, limit = Number(library.config.loading.loadPerIteration) || 1000;
@@ -400,8 +388,8 @@ __private.loadBlockChain = function () {
 
     function checkMemTables(t) {
         var promises = [
-            t.one(sql.countBlocks),
-            t.query(sql.getGenesisBlock),
+            t.one(sql.countBlocks), //查询区块总数
+            t.query(sql.getGenesisBlock),   //查询创世快
             t.one(sql.countMemAccounts),
             t.query(sql.getMemRounds),
             t.query(sql.countDuplicatedDelegates)
@@ -447,7 +435,7 @@ __private.loadBlockChain = function () {
     }
 
     library.db.task(checkMemTables).then(function (results) {
-        var count = results[0].count;
+        var count = results[0].count; //区块高度
 
         library.logger.info('Blocks ' + count);
 
@@ -457,6 +445,7 @@ __private.loadBlockChain = function () {
             return reload(count);
         }
 
+        //校验创世块
         matchGenesisBlock(results[1][0]);
 
         verify = verifySnapshot(count, round);

@@ -97,6 +97,7 @@ var config = {
     db: appConfig.db,
     cache: appConfig.redis,
     cacheEnabled: appConfig.cacheEnabled,
+    ipfs:appConfig.ipfs,
     modules: {
         server: './modules/server.js',
         accounts: './modules/accounts.js',
@@ -408,13 +409,15 @@ d.run(function () {
             var cache = require('./helpers/cache.js');
             cache.connect(config.cacheEnabled, config.cache, logger, cb);
         },
+
+        ipfs: function (cb) {
+            var ipfs = require('./helpers/fileStorage.js');
+            ipfs.connect(config.ipfs, logger, cb);
+        },
+
         /**
          * Once db, bus, schema and genesisblock are completed,
          * loads transaction, block, account and peers from logic folder.
-         * @method logic
-         * @param {object} scope - The results from current execution,
-         * at leats will contain the required elements.
-         * @param {function} cb - Callback function.
          */
         logic: ['db', 'bus', 'schema', 'genesisblock', function (scope, cb) {
             var Transaction = require('./logic/transaction.js');
@@ -458,7 +461,7 @@ d.run(function () {
             }, cb);
         }],
 
-        modules: ['network', 'connect', 'config', 'logger', 'bus', 'sequence', 'dbSequence', 'balancesSequence', 'db', 'logic', 'cache', function (scope, cb) {
+        modules: ['network', 'connect', 'config', 'logger', 'bus', 'sequence', 'dbSequence', 'balancesSequence', 'db', 'logic', 'ipfs', 'cache', function (scope, cb) {
 
             var tasks = {};
 
