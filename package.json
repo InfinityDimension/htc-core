@@ -3,20 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js",
-    "test": "./node_modules/.bin/grunt test --verbose",
-    "jenkins": "./node_modules/.bin/grunt jenkins --verbose",
-    "eslint": "./node_modules/.bin/grunt eslint-nofix --verbose",
-    "fetchCoverage": "./node_modules/.bin/grunt exec:fetchCoverage --verbose",
-    "jsdoc": "jsdoc -c docs/conf.json --verbose --pedantic",
-    "server-docs": "npm run jsdoc && http-server docs/jsdoc/"
+    "start": "node app.js"
   },
   "license": "GPL-3.0",
   "dependencies": {
     "async": "=2.5.0",
-    "bs58": "=4.0.1",
     "bignumber.js": "=4.1.0",
     "body-parser": "=1.18.2",
+    "bs58": "=4.0.1",
     "bytebuffer": "=5.0.1",
     "change-case": "=3.0.1",
     "colors": "=1.1.2",
@@ -47,7 +41,7 @@
     "rimraf": "=2.6.2",
     "semver": "=5.4.1",
     "socket.io": "=2.0.4",
-    "sodium": "=2.0.1",
+    "sodium": "=2.0.3",
     "strftime": "=0.10.0",
     "valid-url": "=1.0.9",
     "validator": "=9.1.1",
