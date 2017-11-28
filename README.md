@@ -62,7 +62,7 @@ Build the user-interface:
 ```
 cd public
 npm install
-bower install
+bower install --allow-root
 grunt release
 ```
 
