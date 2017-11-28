@@ -105,20 +105,21 @@ function DApps(cb, scope) {
      */
     process.on('exit', function () {
         var keys = Object.keys(__private.launched);
+        if (keys.length) {
+            async.eachSeries(keys, function (id, eachSeriesCb) {
+                if (!__private.launched[id]) {
+                    return setImmediate(eachSeriesCb);
+                }
 
-        async.eachSeries(keys, function (id, eachSeriesCb) {
-            if (!__private.launched[id]) {
-                return setImmediate(eachSeriesCb);
-            }
-
-            __private.stopDApp({
-                transactionId: id
+                __private.stopDApp({
+                    transactionId: id
+                }, function (err) {
+                    return setImmediate(eachSeriesCb, err);
+                });
             }, function (err) {
-                return setImmediate(eachSeriesCb, err);
+                library.logger.error(err);
             });
-        }, function (err) {
-            library.logger.error(err);
-        });
+        }
     });
 
     fs.exists(path.join('.', 'public', 'dapps'), function (exists) {
