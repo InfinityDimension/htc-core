@@ -1,13 +1,13 @@
 'use strict';
 
-var async = require('async');
-var bignum = require('./bignum');
-var fs = require('fs');
-var path = require('path');
-var monitor = require('pg-monitor');
+const async = require('async');
+const bignum = require('./bignum');
+const fs = require('fs');
+const path = require('path');
+const monitor = require('pg-monitor');
 
-// var isWin = /^win/.test(process.platform);
-// var isMac = /^darwin/.test(process.platform);
+// let isWin = /^win/.test(process.platform);
+// let isMac = /^darwin/.test(process.platform);
 
 /**
  * Migrator functions
@@ -18,7 +18,7 @@ var monitor = require('pg-monitor');
  */
 function Migrator(pgp, db) {
     /**
-     * Gets one record from `migrations` trable
+     * Gets one record from `migrations` table
      * @method
      * @param {function} waterCb - Callback function
      * @return {function} waterCb with error | Boolean
@@ -61,17 +61,17 @@ function Migrator(pgp, db) {
      * @return {function} waterCb with error | pendingMigrations
      */
     this.readPendingMigrations = function (lastMigration, waterCb) {
-        var migrationsPath = path.join(process.cwd(), 'sql', 'migrations');
-        var pendingMigrations = [];
+        let migrationsPath = path.join(process.cwd(), 'sql', 'migrations');
+        let pendingMigrations = [];
 
         function matchMigrationName(file) {
-            var name = file.match(/_.+\.sql$/);
+            let name = file.match(/_.+\.sql$/);
 
             return Array.isArray(name) ? name[0].replace(/_/, '').replace(/\.sql$/, '') : null;
         }
 
         function matchMigrationId(file) {
-            var id = file.match(/^[0-9]+/);
+            let id = file.match(/^[0-9]+/);
 
             return Array.isArray(id) ? new bignum(id[0]) : null;
         }
@@ -109,10 +109,10 @@ function Migrator(pgp, db) {
      * @return {function} waterCb with error | appliedMigrations
      */
     this.applyPendingMigrations = function (pendingMigrations, waterCb) {
-        var appliedMigrations = [];
+        let appliedMigrations = [];
 
         async.eachSeries(pendingMigrations, function (file, eachCb) {
-            var sql = new pgp.QueryFile(file.path, {minify: true});
+            let sql = new pgp.QueryFile(file.path, {minify: true});
 
             db.query(sql).then(function () {
                 appliedMigrations.push(file);
@@ -151,8 +151,8 @@ function Migrator(pgp, db) {
      * @return {function} waterCb with error
      */
     this.applyRuntimeQueryFile = function (waterCb) {
-        var dirname = path.basename(__dirname) === 'helpers' ? path.join(__dirname, '..') : __dirname;
-        var sql = new pgp.QueryFile(path.join(dirname, 'sql', 'runtime.sql'), {minify: true});
+        let dirname = path.basename(__dirname) === 'helpers' ? path.join(__dirname, '..') : __dirname;
+        let sql = new pgp.QueryFile(path.join(dirname, 'sql', 'runtime.sql'), {minify: true});
 
         db.query(sql).then(function () {
             return waterCb();
@@ -164,35 +164,24 @@ function Migrator(pgp, db) {
 
 /**
  * Connects to the database and performs:
- * - checkMigrations
- * - getLastMigration
- * - readPendingMigrations
- * - applyPendingMigrations
- * - insertAppliedMigrations
- * - applyRuntimeQueryFile
- * @memberof module:helpers
- * @requires pg-promise
- * @requires pg-monitor
- * @implements Migrator
- * @function connect
  * @param {Object} config
  * @param {function} logger
  * @param {function} cb
  * @return {function} error|cb
  */
 module.exports.connect = function (config, logger, cb) {
-    var pgOptions = {
+    let pgOptions = {
         pgNative: true
     };
 
-    var pgp = require('pg-promise')(pgOptions);
+    let pgp = require('pg-promise')(pgOptions);
 
     try {
         monitor.detach();
     } catch (ex) {
     }
 
-    monitor.attach(pgOptions, config.logEvents);
+    monitor.attach(pgOptions, config.logEvents); //pg监控级别
     monitor.setTheme('matrix');
 
     monitor.log = function (msg, info) {
@@ -202,8 +191,8 @@ module.exports.connect = function (config, logger, cb) {
 
     config.user = config.user || process.env.USER;
 
-    var db = pgp(config);
-    var migrator = new Migrator(pgp, db);
+    let db = pgp(config);
+    let migrator = new Migrator(pgp, db);
 
     async.waterfall([
         migrator.checkMigrations,
