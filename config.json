@@ -9,6 +9,7 @@
   "trustProxy": false,
   "topAccounts": false,
   "cacheEnabled": false,
+  "codeCoverage": true,
   "db": {
     "host": "localhost",
     "port": 5432,
@@ -201,7 +202,7 @@
     }
   },
   "dapp": {
-    "masterrequired": true,
+    "masterrequired": false,
     "masterpassword": "rXfxn7nYqiq2",
     "autoexec": []
   },

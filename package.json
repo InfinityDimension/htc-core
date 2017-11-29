@@ -26,6 +26,7 @@
     "extend": "=3.0.1",
     "ip": "=1.1.5",
     "ipfs-api": "=17.0.1",
+    "istanbul-middleware": "=0.2.2",
     "json-schema": "=0.2.3",
     "json-sql": "CaritasChain/json-sql#27e1ed1",
     "lisk-sandbox": "LiskHQ/lisk-sandbox#162da38",

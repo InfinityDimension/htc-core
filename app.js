@@ -1,33 +1,28 @@
 'use strict';
 
-/**
- * Main entry point.
- * @module app
- */
-
-var async = require('async');
-var checkIpInList = require('./helpers/checkIpInList.js');
-var extend = require('extend');
-var fs = require('fs');
-var git = require('./helpers/git.js');
-var https = require('https');
-var Logger = require('./logger.js');
-var packageJson = require('./package.json');
-var path = require('path');
-var program = require('commander');
-var httpApi = require('./helpers/httpApi.js');
-var Sequence = require('./helpers/sequence.js');
-var util = require('util');
-var z_schema = require('./helpers/z_schema.js');
+const async = require('async');
+const checkIpInList = require('./helpers/checkIpInList.js');
+const extend = require('extend');
+const fs = require('fs');
+const git = require('./helpers/git.js');
+const https = require('https');
+const Logger = require('./logger.js');
+const packageJson = require('./package.json');
+const path = require('path');
+const program = require('commander');
+const httpApi = require('./helpers/httpApi.js');
+const Sequence = require('./helpers/sequence.js');
+const util = require('util');
+const z_schema = require('./helpers/z_schema.js');
 
 process.stdin.resume();
 
-var versionBuild = fs.readFileSync(path.join(__dirname, 'build'), 'utf8');
+let versionBuild = fs.readFileSync(path.join(__dirname, 'build'), 'utf8');
 
 /**
  * @property {string} - Hash of last git commit.
  */
-var lastCommit = '';
+let lastCommit = '';
 
 if (typeof gc !== 'undefined') {
     setInterval(function () {
@@ -46,22 +41,23 @@ program
     .option('-s, --snapshot <round>', 'verify snapshot')
     .parse(process.argv);
 
-/**
- * @property {object} - The default list of configuration options. Can be updated by CLI.
- * @default 'config.json'
- */
-var appConfig = require('./helpers/config.js')(program.config);
+// 配置文件
+let appConfig = require('./helpers/config.js')(program.config);
 
-var genesisblock = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), (program.genesisBlock || 'genesisBlock.json')), 'utf8'));
+//创世块
+let genesisblock = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), (program.genesisBlock || 'genesisBlock.json')), 'utf8'));
 
+//端口设置
 if (program.port) {
     appConfig.port = program.port;
 }
 
+//IP地址
 if (program.address) {
     appConfig.address = program.address;
 }
 
+//种子节点
 if (program.peers) {
     if (typeof program.peers === 'string') {
         appConfig.peers.list = program.peers.split(',').map(function (peer) {
@@ -76,6 +72,7 @@ if (program.peers) {
     }
 }
 
+//控制台输出日志级别
 if (program.log) {
     appConfig.consoleLogLevel = program.log;
 }
@@ -86,14 +83,10 @@ if (program.snapshot) {
     );
 }
 
-if (process.env.NODE_ENV === 'test') {
-    appConfig.coverage = true;
-}
-
 // Define top endpoint availability
 process.env.TOP = appConfig.topAccounts;
 
-var config = {
+let config = {
     db: appConfig.db,
     cache: appConfig.redis,
     cacheEnabled: appConfig.cacheEnabled,
@@ -135,7 +128,7 @@ var config = {
  * 新建日志处理对象
  * @type {module.exports|exports}
  */
-var logger = new Logger({
+let logger = new Logger({
     echo: appConfig.consoleLogLevel, errorLevel: appConfig.fileLogLevel,
     filename: appConfig.logFileName
 });
@@ -151,16 +144,15 @@ try {
  * Creates the express server and loads all the Modules and logic.
  * @property {object} - Domain instance.
  */
-var d = require('domain').create();
+let d = require('domain').create();
 
 d.on('error', function (err) {
     logger.fatal('Domain master', {message: err.message, stack: err.stack});
     process.exit(0);
 });
 
-// runs domain
 d.run(function () {
-    var modules = [];
+    let modules = [];
     async.auto({
         /**
          * Loads `payloadHash` and generate dapp password if it is empty and required.
@@ -175,7 +167,7 @@ d.run(function () {
             }
 
             if (appConfig.dapp.masterrequired && !appConfig.dapp.masterpassword) {
-                var randomstring = require('randomstring');
+                let randomstring = require('randomstring');
 
                 appConfig.dapp.masterpassword = randomstring.generate({
                     length: 12,
@@ -224,17 +216,15 @@ d.run(function () {
             cb(null, new z_schema());
         },
 
-        /**
-         * Once config is completed, creates app, http & https servers & sockets with express.
-         */
         network: ['config', function (scope, cb) {
-            var express = require('express');
-            var compression = require('compression');  //压缩中间件
-            var cors = require('cors');  //跨域相关中间件
-            var app = express();
+            const express = require('express');
+            const compression = require('compression');  //压缩中间件
+            const cors = require('cors');  //跨域相关中间件
+            const app = express();
 
-            if (appConfig.coverage) {
-                var im = require('istanbul-middleware');
+            //代码覆盖率检测
+            if (appConfig.codeCoverage) {
+                const im = require('istanbul-middleware');
                 logger.debug('Hook loader for coverage - do not use in production environment!');
                 im.hookLoader(__dirname);
                 app.use('/coverage', im.createHandler());
@@ -246,10 +236,10 @@ d.run(function () {
             app.use(cors());
             app.options('*', cors());
 
-            var server = require('http').createServer(app);
-            var io = require('socket.io')(server);
+            const server = require('http').createServer(app);
+            const io = require('socket.io')(server);
 
-            var privateKey, certificate, https, https_io;
+            let privateKey, certificate, https, https_io;
 
             if (scope.config.ssl.enabled) {
                 privateKey = fs.readFileSync(scope.config.ssl.options.key);
@@ -275,7 +265,7 @@ d.run(function () {
         }],
 
         dbSequence: ['logger', function (scope, cb) {
-            var sequence = new Sequence({
+            let sequence = new Sequence({
                 onWarning: function (current, limit) {
                     scope.logger.warn('DB queue', current);
                 }
@@ -284,7 +274,7 @@ d.run(function () {
         }],
 
         sequence: ['logger', function (scope, cb) {
-            var sequence = new Sequence({
+            let sequence = new Sequence({
                 onWarning: function (current, limit) {
                     scope.logger.warn('Main queue', current);
                 }
@@ -293,7 +283,7 @@ d.run(function () {
         }],
 
         balancesSequence: ['logger', function (scope, cb) {
-            var sequence = new Sequence({
+            let sequence = new Sequence({
                 onWarning: function (current, limit) {
                     scope.logger.warn('Balance queue', current);
                 }
@@ -301,16 +291,12 @@ d.run(function () {
             cb(null, sequence);
         }],
 
-        /**
-         * Once config, public, genesisblock, logger, build and network are completed,
-         * adds configuration to `network.app`.
-         */
         connect: ['config', 'public', 'genesisblock', 'logger', 'build', 'network', function (scope, cb) {
-            var path = require('path');
-            var bodyParser = require('body-parser');
-            var methodOverride = require('method-override');
-            var queryParser = require('express-query-int');
-            var randomString = require('randomstring');
+            let path = require('path');
+            let bodyParser = require('body-parser');
+            let methodOverride = require('method-override'); //将GET或者POST改成其他谓词PUT,DELETE等
+            let queryParser = require('express-query-int');
+            let randomString = require('randomstring');
 
             scope.nonce = randomString.generate(16);
             scope.network.app.engine('html', require('ejs').renderFile);
@@ -323,7 +309,7 @@ d.run(function () {
             scope.network.app.use(bodyParser.json({limit: '2mb'}));
             scope.network.app.use(methodOverride());
 
-            var ignore = ['id', 'name', 'lastBlockId', 'blockId', 'transactionId', 'address', 'recipientId', 'senderId', 'previousBlock'];
+            let ignore = ['id', 'name', 'lastBlockId', 'blockId', 'transactionId', 'address', 'recipientId', 'senderId', 'previousBlock'];
 
             scope.network.app.use(queryParser({
                 parser: function (value, radix, name) {
@@ -372,13 +358,13 @@ d.run(function () {
         },
 
         bus: ['ed', function (scope, cb) {
-            var changeCase = require('change-case');
-            var bus = function () {
+            let changeCase = require('change-case');
+            let bus = function () {
                 this.message = function () {
-                    var args = [];
+                    let args = [];
                     Array.prototype.push.apply(args, arguments);
-                    var topic = args.shift();
-                    var eventName = 'on' + changeCase.pascalCase(topic);
+                    let topic = args.shift();
+                    let eventName = 'on' + changeCase.pascalCase(topic);
 
                     // executes the each module onBind function
                     modules.forEach(function (module) {
@@ -398,7 +384,7 @@ d.run(function () {
             cb(null, new bus());
         }],
         db: function (cb) {
-            var db = require('./helpers/database.js');
+            let db = require('./helpers/database.js');
             db.connect(config.db, logger, cb);
         },
         /**
@@ -406,12 +392,12 @@ d.run(function () {
          * @param {function} cb
          */
         cache: function (cb) {
-            var cache = require('./helpers/cache.js');
+            let cache = require('./helpers/cache.js');
             cache.connect(config.cacheEnabled, config.cache, logger, cb);
         },
 
         ipfs: function (cb) {
-            var ipfs = require('./helpers/fileStorage.js');
+            let ipfs = require('./helpers/fileStorage.js');
             ipfs.connect(config.ipfs, logger, cb);
         },
 
@@ -420,10 +406,10 @@ d.run(function () {
          * loads transaction, block, account and peers from logic folder.
          */
         logic: ['db', 'bus', 'schema', 'genesisblock', function (scope, cb) {
-            var Transaction = require('./logic/transaction.js');
-            var Block = require('./logic/block.js');
-            var Account = require('./logic/account.js');
-            var Peers = require('./logic/peers.js');
+            let Transaction = require('./logic/transaction.js');
+            let Block = require('./logic/block.js');
+            let Account = require('./logic/account.js');
+            let Peers = require('./logic/peers.js');
 
             async.auto({
                 bus: function (cb) {
@@ -463,11 +449,11 @@ d.run(function () {
 
         modules: ['network', 'connect', 'config', 'logger', 'bus', 'sequence', 'dbSequence', 'balancesSequence', 'db', 'logic', 'ipfs', 'cache', function (scope, cb) {
 
-            var tasks = {};
+            let tasks = {};
 
             Object.keys(config.modules).forEach(function (name) {
                 tasks[name] = function (cb) {
-                    var d = require('domain').create();
+                    let d = require('domain').create();
 
                     d.on('error', function (err) {
                         scope.logger.fatal('Domain ' + name, {message: err.message, stack: err.stack});
@@ -475,8 +461,8 @@ d.run(function () {
 
                     d.run(function () {
                         logger.debug('Loading module', name);
-                        var Klass = require(config.modules[name]);
-                        var obj = new Klass(cb, scope);
+                        let Klass = require(config.modules[name]);
+                        let obj = new Klass(cb, scope);
                         modules.push(obj);
                     });
                 };
@@ -490,9 +476,9 @@ d.run(function () {
         api: ['modules', 'logger', 'network', function (scope, cb) {
             Object.keys(config.api).forEach(function (moduleName) {
                 Object.keys(config.api[moduleName]).forEach(function (protocol) {
-                    var apiEndpointPath = config.api[moduleName][protocol];
+                    let apiEndpointPath = config.api[moduleName][protocol];
                     try {
-                        var ApiEndpoint = require(apiEndpointPath);
+                        let ApiEndpoint = require(apiEndpointPath);
                         new ApiEndpoint(scope.modules[moduleName], scope.network.app, scope.logger, scope.modules.cache);
                     } catch (e) {
                         scope.logger.error('Unable to load API endpoint for ' + moduleName + ' of ' + protocol, e);

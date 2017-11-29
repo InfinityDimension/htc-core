@@ -1,20 +1,15 @@
 'use strict';
 
-var RateLimit = require('express-rate-limit');
+//定义规定时间内同一操作不能超过多次
+const RateLimit = require('express-rate-limit');
 
-var defaults = {
+let defaults = {
     max: 0, // Disabled
     delayMs: 0, // Disabled
     delayAfter: 0, // Disabled
     windowMs: 60000 // 1 minute window
 };
 
-/**
- * Returns limits object from input or default values.
- * @private
- * @param {Object} [limits]
- * @returns {Object} max, delayMs, delayAfter, windowMs
- */
 function applyLimits(limits) {
     if (typeof limits === 'object') {
         return {
@@ -28,15 +23,6 @@ function applyLimits(limits) {
     }
 }
 
-/**
- * Applies limits config to app.
- * @memberof module:helpers
- * @function request-limiter
- * @implements applyLimits
- * @param {Object} app - Application instance
- * @param {Object} config
- * @return {Object} limits per client and peer
- */
 module.exports = function (app, config) {
     if (config.trustProxy) {
         app.enable('trust proxy');
@@ -48,7 +34,7 @@ module.exports = function (app, config) {
     config.peers = config.peers || {};
     config.peers.options = config.peers.options || {};
 
-    var limits = {
+    let limits = {
         client: applyLimits(config.api.options.limits),
         peer: applyLimits(config.peers.options.limits)
     };
