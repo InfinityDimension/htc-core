@@ -5,7 +5,6 @@ const bignum = require('../helpers/bignum.js');
 const ByteBuffer = require('bytebuffer');
 const constants = require('../helpers/constants.js');
 const crypto = require('crypto');
-const exceptions = require('../helpers/exceptions.js');
 const extend = require('extend');
 const slots = require('../helpers/slots.js');
 const sql = require('../sql/transactions.js');
@@ -316,13 +315,12 @@ Transaction.prototype.checkBalance = function (amount, balance, trs, sender) {
 };
 
 /**
- * Validates parameters.
- * Calls `process` based on trs type (see privateTypes)
- * @param {transaction} trs
- * @param {account} sender
- * @param {account} requester
- * @param {function} cb
- * @return  validation errors | trs
+ *
+ * @param trs
+ * @param sender
+ * @param requester
+ * @param cb
+ * @returns {Number}
  */
 Transaction.prototype.process = function (trs, sender, requester, cb) {
     if (typeof requester === 'function') {
@@ -387,20 +385,6 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
     let valid = false;
     let err = null;
 
-    if (typeof requester === 'function') {
-        cb = requester;
-    }
-
-    // Check sender
-    if (!sender) {
-        return setImmediate(cb, 'Missing sender');
-    }
-
-    // Check transaction type
-    if (!__private.types[trs.type]) {
-        return setImmediate(cb, 'Unknown transaction type ' + trs.type);
-    }
-
     // Check for missing sender second signature
     if (!trs.requesterPublicKey && sender.secondSignature && !trs.signSignature && trs.blockId !== this.scope.genesisblock.block.id) {
         return setImmediate(cb, 'Missing sender second signature');
@@ -419,28 +403,6 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
     // If second signature provided, check if requester has one enabled
     if (trs.requesterPublicKey && !requester.secondSignature && (trs.signSignature && trs.signSignature.length > 0)) {
         return setImmediate(cb, 'Requester does not have a second signature');
-    }
-
-    // Check sender public key
-    if (sender.publicKey && sender.publicKey !== trs.senderPublicKey) {
-        err = ['Invalid sender public key:', trs.senderPublicKey, 'expected:', sender.publicKey].join(' ');
-
-        if (exceptions.senderPublicKey.indexOf(trs.id) > -1) {
-            this.scope.logger.debug(err);
-            this.scope.logger.debug(JSON.stringify(trs));
-        } else {
-            return setImmediate(cb, err);
-        }
-    }
-
-    // Check sender is not genesis account unless block id equals genesis
-    if ([exceptions.genesisPublicKey.mainnet, exceptions.genesisPublicKey.testnet].indexOf(sender.publicKey) !== -1 && trs.blockId !== this.scope.genesisblock.block.id) {
-        return setImmediate(cb, 'Invalid sender. Can not send from genesis account');
-    }
-
-    // Check sender address
-    if (String(trs.senderId).toUpperCase() !== String(sender.address).toUpperCase()) {
-        return setImmediate(cb, 'Invalid sender address');
     }
 
     // Determine multisignatures from sender or transaction asset
@@ -476,19 +438,6 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
     } catch (e) {
         this.scope.logger.error(e.stack);
         return setImmediate(cb, e.toString());
-    }
-
-    if (!valid) {
-        err = 'Failed to verify signature';
-
-        if (exceptions.signatures.indexOf(trs.id) > -1) {
-            this.scope.logger.debug(err);
-            this.scope.logger.debug(JSON.stringify(trs));
-            valid = true;
-            err = null;
-        } else {
-            return setImmediate(cb, err);
-        }
     }
 
     // Verify second signature
@@ -542,7 +491,7 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
 
     // Calculate fee
     let fee = __private.types[trs.type].calculateFee.call(this, trs, sender);
-    if (fee !== 0 && !fee || trs.fee !== fee) {
+    if (trs.fee !== fee) {
         return setImmediate(cb, 'Invalid transaction fee');
     }
 
@@ -584,10 +533,6 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
  * @throws {error}
  */
 Transaction.prototype.verifySignature = function (trs, publicKey, signature) {
-    if (!__private.types[trs.type]) {
-        throw 'Unknown transaction type ' + trs.type;
-    }
-
     if (!signature) {
         return false;
     }
@@ -1028,17 +973,11 @@ Transaction.prototype.schema = {
 };
 
 /**
- * Calls `objectNormalize` based on trs type (privateTypes).
- * @see privateTypes
- * @param {transaction} trs
- * @return {error|transaction} error string | trs normalized
- * @throws {string} error message
+ * 使得交易标准化
+ * @param trs
+ * @returns {*}
  */
 Transaction.prototype.objectNormalize = function (trs) {
-    if (!__private.types[trs.type]) {
-        throw 'Unknown transaction type ' + trs.type;
-    }
-
     for (let i in trs) {
         if (trs[i] === null || typeof trs[i] === 'undefined') {
             delete trs[i];

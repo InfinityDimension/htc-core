@@ -4,7 +4,6 @@ var async = require('async');
 var ByteBuffer = require('bytebuffer');
 var constants = require('../helpers/constants.js');
 var Diff = require('../helpers/diff.js');
-var exceptions = require('../helpers/exceptions.js');
 
 // Private fields
 var modules, library, __private = {};
@@ -105,12 +104,7 @@ Multisignature.prototype.verify = function (trs, sender, cb) {
     if (trs.asset.multisignature.min > trs.asset.multisignature.keysgroup.length) {
         var err = 'Invalid multisignature min. Must be less than or equal to keysgroup size';
 
-        if (exceptions.multisignatures.indexOf(trs.id) > -1) {
-            this.scope.logger.debug(err);
-            this.scope.logger.debug(JSON.stringify(trs));
-        } else {
-            return setImmediate(cb, err);
-        }
+        return setImmediate(cb, err);
     }
 
     if (trs.asset.multisignature.lifetime < constants.multisigConstraints.lifetime.minimum ||

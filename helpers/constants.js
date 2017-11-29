@@ -10,11 +10,11 @@ module.exports = {
     epochTime: new Date(Date.UTC(2017, 10, 14, 11, 0, 0, 0)),
     fees: {
         send: 0,
-        vote: 100000000,
-        secondsignature: 500000000,
-        delegate: 2500000000,
-        multisignature: 500000000,
-        dapp: 2500000000
+        vote: 0,
+        secondsignature: 0,
+        delegate: 0,
+        multisignature: 0,
+        dapp: 0
     },
     feeStart: 1,
     feeStartVolume: 10000 * 100000000,
@@ -40,11 +40,11 @@ module.exports = {
     // WARNING: When changing rewards you also need to change getBlockRewards(int) SQL function!
     rewards: {
         milestones: [
-            500000000, // Initial Reward
-            400000000, // Milestone 1
-            300000000, // Milestone 2
-            200000000, // Milestone 3
-            100000000  // Milestone 4
+            0, // Initial Reward
+            0, // Milestone 1
+            0, // Milestone 2
+            0, // Milestone 3
+            0  // Milestone 4
         ],
         offset: 1451520,   // Start rewards at block (n)
         distance: 3000000, // Distance between each milestone

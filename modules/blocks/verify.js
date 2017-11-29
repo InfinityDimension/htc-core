@@ -6,7 +6,6 @@ var constants = require('../../helpers/constants.js');
 var crypto = require('crypto');
 var slots = require('../../helpers/slots.js');
 var sql = require('../../sql/blocks.js');
-var exceptions = require('../../helpers/exceptions.js');
 
 var modules, library, self, __private = {};
 
@@ -172,21 +171,13 @@ __private.verifyVersion = function (block, result) {
 };
 
 /**
- * Verify block reward
+ * 验证区块奖励
  *
- * @private
- * @method verifyBlock
- * @method verifyReceipt
- * @param  {Object}  block Target block
- * @param  {Object}  result Verification results
- * @return {Object}  result Verification results
- * @return {boolean} result.verified Indicator that verification passed
- * @return {Array}   result.errors Array of validation errors
  */
 __private.verifyReward = function (block, result) {
-    var expectedReward = __private.blockReward.calcReward(block.height);
-
-    if (block.height !== 1 && expectedReward !== block.reward && exceptions.blockRewards.indexOf(block.id) === -1) {
+    // var expectedReward = __private.blockReward.calcReward(block.height);
+    var expectedReward = 0;
+    if (block.height !== 1 && expectedReward !== block.reward) {
         result.errors.push(['Invalid block reward:', block.reward, 'expected:', expectedReward].join(' '));
     }
 
