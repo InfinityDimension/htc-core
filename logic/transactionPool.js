@@ -12,11 +12,6 @@ var modules, library, self, __private = {};
 /**
  * Initializes variables, sets bundled transaction timer and
  * transaction expiry timer.
- * @memberof module:transactions
- * @class
- * @classdesc Main transactionPool logic.
- * @implements {processBundled}
- * @implements {expireTransactions}
  * @param {number} broadcastInterval
  * @param {number} releaseLimit
  * @param {Transaction} transaction - Logic instance
@@ -567,12 +562,8 @@ TransactionPool.prototype.undoUnconfirmedList = function (cb) {
 
 /**
  * expires transactions.
- * @implements {__private.expireTransactions}
- * @implements {getUnconfirmedTransactionList}
- * @implements {getQueuedTransactionList}
- * @implements {getMultisignatureTransactionList}
  * @param {function} cb - Callback function.
- * @return {setImmediateCallback} error | ids[]
+ * @return error | ids[]
  */
 TransactionPool.prototype.expireTransactions = function (cb) {
     var ids = [];
@@ -795,7 +786,6 @@ __private.transactionTimeOut = function (transaction) {
 
 /**
  * Removes unconfirmed transactions if expired.
- * @private
  * @implements {__private.transactionTimeOut}
  * @implements {removeUnconfirmedTransaction}
  * @param {transaction[]} transactions

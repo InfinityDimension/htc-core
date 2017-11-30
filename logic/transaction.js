@@ -878,30 +878,6 @@ Transaction.prototype.afterSave = function (trs, cb) {
     }
 };
 
-/**
- * @typedef {Object} transaction
- * @property {string} id
- * @property {number} height
- * @property {string} blockId
- * @property {number} type
- * @property {number} timestamp
- * @property {publicKey} senderPublicKey
- * @property {publicKey} requesterPublicKey
- * @property {string} senderId
- * @property {string} recipientId
- * @property {number} amount
- * @property {number} fee
- * @property {string} signature
- * @property {string} signSignature
- * @property {Object} asset
- * @property {multisignature} [asset.multisignature]
- * @property {signature} [asset.signature]
- * @property {dapp} [asset.dapp]
- * @property {Object} [asset.outTransfer] - Contains dappId and transactionId
- * @property {Object} [asset.inTransfer] - Contains dappId
- * @property {votes} [asset.votes] - Contains multiple votes to a transactionId
- *
- */
 Transaction.prototype.schema = {
     id: 'Transaction',
     type: 'object',
@@ -973,7 +949,7 @@ Transaction.prototype.schema = {
 };
 
 /**
- * 使得交易标准化
+ * Normalizes transaction
  * @param trs
  * @returns {*}
  */

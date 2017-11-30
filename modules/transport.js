@@ -212,15 +212,11 @@ __private.receiveTransactions = function (query, peer, extraLogMessage, cb) {
  * Calls balancesSequence.add to receive transaction and
  * processUnconfirmedTransaction to confirm it.
  * @private
- * @implements {library.logic.transaction.objectNormalize}
- * @implements {__private.removePeer}
- * @implements {library.balancesSequence.add}
- * @implements {modules.transactions.processUnconfirmedTransaction}
  * @param {transaction} transaction
  * @param {peer} peer
  * @param {string} extraLogMessage
  * @param {function} cb
- * @return {setImmediateCallback} cb, error message
+ * @return cb, error message
  */
 __private.receiveTransaction = function (transaction, peer, extraLogMessage, cb) {
     var id = (transaction ? transaction.id : 'null');
@@ -235,11 +231,13 @@ __private.receiveTransaction = function (transaction, peer, extraLogMessage, cb)
             tx: transaction
         });
 
+        //移除坏节点
         __private.removePeer({peer: peer, code: 'ETRANSACTION'}, extraLogMessage);
 
         return setImmediate(cb, 'Invalid transaction body - ' + e.toString());
     }
 
+    // add transaction to balanceSequence
     library.balancesSequence.add(function (cb) {
         library.logger.debug('Received transaction ' + transaction.id + ' from peer ' + peer.string);
         modules.transactions.processUnconfirmedTransaction(transaction, true, function (err) {
