@@ -1,7 +1,7 @@
 'use strict';
 
-var Router = require('../../helpers/router');
-var httpApi = require('../../helpers/httpApi');
+var Router = require('../helpers/router');
+var httpApi = require('../helpers/httpApi');
 
 // Constructor
 function TransactionsHttpApi(transactionsModule, app, logger, cache) {

@@ -1,8 +1,8 @@
 'use strict';
 
-var Router = require('../../helpers/router');
-var httpApi = require('../../helpers/httpApi');
-var schema = require('../../schema/accounts.js');
+var Router = require('../helpers/router');
+var httpApi = require('../helpers/httpApi');
+var schema = require('../schema/accounts.js');
 
 function AccountsHttpApi(accountsModule, app) {
 

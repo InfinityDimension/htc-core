@@ -1,8 +1,8 @@
 'use strict';
 
-var Router = require('../../helpers/router');
-var httpApi = require('../../helpers/httpApi');
-var schema = require('../../schema/dapps');
+var Router = require('../helpers/router');
+var httpApi = require('../helpers/httpApi');
+var schema = require('../schema/dapps');
 
 // Constructor
 function DappsHttpApi(dappsModule, app) {

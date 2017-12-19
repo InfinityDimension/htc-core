@@ -110,17 +110,17 @@ let config = {
         cache: './modules/cache.js'
     },
     api: {
-        accounts: {http: './api/http/accounts.js'},
-        blocks: {http: './api/http/blocks.js'},
-        dapps: {http: './api/http/dapps.js'},
-        delegates: {http: './api/http/delegates.js'},
-        loader: {http: './api/http/loader.js'},
-        multisignatures: {http: './api/http/multisignatures.js'},
-        peers: {http: './api/http/peers.js'},
-        server: {http: './api/http/server.js'},
-        signatures: {http: './api/http/signatures.js'},
-        transactions: {http: './api/http/transactions.js'},
-        transport: {http: './api/http/transport.js'}
+        accounts: {http: './api/accounts.js'},
+        blocks: {http: './api/blocks.js'},
+        dapps: {http: './api/dapps.js'},
+        delegates: {http: './api/delegates.js'},
+        loader: {http: './api/loader.js'},
+        multisignatures: {http: './api/multisignatures.js'},
+        peers: {http: './api/peers.js'},
+        server: {http: './api/server.js'},
+        signatures: {http: './api/signatures.js'},
+        transactions: {http: './api/transactions.js'},
+        transport: {http: './api/transport.js'}
     }
 };
 
