@@ -1,17 +1,16 @@
 'use strict';
 
-var _ = require('lodash');
-var bignum = require('../helpers/bignum.js');
-var ByteBuffer = require('bytebuffer');
-var constants = require('../helpers/constants.js');
-var crypto = require('crypto');
-var exceptions = require('../helpers/exceptions.js');
-var extend = require('extend');
-var slots = require('../helpers/slots.js');
-var sql = require('../sql/transactions.js');
+const _ = require('lodash');
+const bignum = require('../helpers/bignum.js');
+const ByteBuffer = require('bytebuffer');
+const constants = require('../helpers/constants.js');
+const crypto = require('crypto');
+const extend = require('extend');
+const slots = require('../helpers/slots.js');
+const sql = require('../sql/transactions.js');
 
 // Private fields
-var self, modules, __private = {};
+let self, modules, __private = {};
 
 /**
  * @typedef {Object} privateTypes
@@ -28,9 +27,6 @@ __private.types = {};
 
 /**
  * Main transaction logic.
- * @memberof module:transactions
- * @class
- * @classdesc Main transaction logic.
  * @param {Database} db
  * @param {Object} ed
  * @param {ZSchema} schema
@@ -38,7 +34,7 @@ __private.types = {};
  * @param {Account} account
  * @param {Object} logger
  * @param {function} cb - Callback function.
- * @return {setImmediateCallback} With `this` as data.
+ * @return  With `this` as data.
  */
 // Constructor
 function Transaction(db, ed, schema, genesisblock, account, logger, cb) {
@@ -64,8 +60,6 @@ function Transaction(db, ed, schema, genesisblock, account, logger, cb) {
  * - calls `calculateFee` based on data type (see privateTypes)
  * - creates signatures
  * @see privateTypes
- * @implements {sign}
- * @implements {getId}
  * @param {Object} data
  * @return {transaction} trs
  */
@@ -82,7 +76,7 @@ Transaction.prototype.create = function (data) {
         throw 'Invalid keypair';
     }
 
-    var trs = {
+    let trs = {
         type: data.type,
         amount: 0,
         senderPublicKey: data.sender.publicKey,
@@ -129,36 +123,29 @@ Transaction.prototype.attachAssetType = function (typeId, instance) {
 
 /**
  * Creates a signature
- * @implements {getHash}
- * @implements {scope.ed.sign}
  * @param {Object} keypair - Constains privateKey and publicKey
  * @param {transaction} trs
  * @return {signature} sign
  */
 Transaction.prototype.sign = function (keypair, trs) {
-    var hash = this.getHash(trs);
+    let hash = this.getHash(trs);
     return this.scope.ed.sign(hash, keypair).toString('hex');
 };
 
 /**
  * Creates a signature based on multiple signatures
- * @implements {getBytes}
- * @implements {crypto.createHash}
- * @implements {scope.ed.sign}
  * @param {Object} keypair - Constains privateKey and publicKey
  * @param {transaction} trs
  * @return {signature} sign
  */
 Transaction.prototype.multisign = function (keypair, trs) {
-    var bytes = this.getBytes(trs, true, true);
-    var hash = crypto.createHash('sha256').update(bytes).digest();
+    let bytes = this.getBytes(trs, true, true);
+    let hash = crypto.createHash('sha256').update(bytes).digest();
     return this.scope.ed.sign(hash, keypair).toString('hex');
 };
 
 /**
  * Calculates transaction id based on transaction
- * @implements {bignum}
- * @implements {getHash}
  * @param {transaction} trs
  * @return {string} id
  */
@@ -168,8 +155,6 @@ Transaction.prototype.getId = function (trs) {
 
 /**
  * Creates hash based on transaction bytes.
- * @implements {getBytes}
- * @implements {crypto.createHash}
  * @param {transaction} trs
  * @return {hash} sha256 crypto hash
  */
@@ -180,7 +165,6 @@ Transaction.prototype.getHash = function (trs) {
 /**
  * Calls `getBytes` based on trs type (see privateTypes)
  * @see privateTypes
- * @implements {ByteBuffer}
  * @param {transaction} trs
  * @param {boolean} skipSignature
  * @param {boolean} skipSecondSignature
@@ -192,31 +176,31 @@ Transaction.prototype.getBytes = function (trs, skipSignature, skipSecondSignatu
         throw 'Unknown transaction type ' + trs.type;
     }
 
-    var bb;
+    let bb;
 
     try {
-        var assetBytes = __private.types[trs.type].getBytes.call(this, trs, skipSignature, skipSecondSignature);
-        var assetSize = assetBytes ? assetBytes.length : 0;
-        var i;
+        let assetBytes = __private.types[trs.type].getBytes.call(this, trs, skipSignature, skipSecondSignature);
+        let assetSize = assetBytes ? assetBytes.length : 0;
+        let i;
 
         bb = new ByteBuffer(1 + 4 + 32 + 32 + 8 + 8 + 64 + 64 + assetSize, true);
         bb.writeByte(trs.type);
         bb.writeInt(trs.timestamp);
 
-        var senderPublicKeyBuffer = Buffer.from(trs.senderPublicKey, 'hex');
+        let senderPublicKeyBuffer = Buffer.from(trs.senderPublicKey, 'hex');
         for (i = 0; i < senderPublicKeyBuffer.length; i++) {
             bb.writeByte(senderPublicKeyBuffer[i]);
         }
 
         if (trs.requesterPublicKey) {
-            var requesterPublicKey = Buffer.from(trs.requesterPublicKey, 'hex');
+            let requesterPublicKey = Buffer.from(trs.requesterPublicKey, 'hex');
             for (i = 0; i < requesterPublicKey.length; i++) {
                 bb.writeByte(requesterPublicKey[i]);
             }
         }
 
         if (trs.recipientId) {
-            var recipient = trs.recipientId.slice(0, -1);
+            let recipient = trs.recipientId.slice(0, -1);
             recipient = Buffer.from(recipient, 'utf-8');
 
             for (i = 0; i < 8; i++) {
@@ -237,14 +221,14 @@ Transaction.prototype.getBytes = function (trs, skipSignature, skipSecondSignatu
         }
 
         if (!skipSignature && trs.signature) {
-            var signatureBuffer = Buffer.from(trs.signature, 'hex');
+            let signatureBuffer = Buffer.from(trs.signature, 'hex');
             for (i = 0; i < signatureBuffer.length; i++) {
                 bb.writeByte(signatureBuffer[i]);
             }
         }
 
         if (!skipSecondSignature && trs.signSignature) {
-            var signSignatureBuffer = Buffer.from(trs.signSignature, 'hex');
+            let signSignatureBuffer = Buffer.from(trs.signSignature, 'hex');
             for (i = 0; i < signSignatureBuffer.length; i++) {
                 bb.writeByte(signSignatureBuffer[i]);
             }
@@ -281,22 +265,21 @@ Transaction.prototype.ready = function (trs, sender) {
  * Counts transactions from `trs` table by id
  * @param {transaction} trs
  * @param {function} cb
- * @return {setImmediateCallback} error | row.count
  */
 Transaction.prototype.countById = function (trs, cb) {
+    let logger=this.scope.logger;
     this.scope.db.one(sql.countById, {id: trs.id}).then(function (row) {
         return setImmediate(cb, null, row.count);
     }).catch(function (err) {
-        this.scope.logger.error(err.stack);
+        logger.error(err.stack);
         return setImmediate(cb, 'Transaction#countById error');
     });
 };
 
 /**
- * @implements {countById}
  * @param {transaction} trs
  * @param {function} cb
- * @return {setImmediateCallback} error | cb
+ * @return  error | cb
  */
 Transaction.prototype.checkConfirmed = function (trs, cb) {
     this.countById(trs, function (err, count) {
@@ -312,7 +295,6 @@ Transaction.prototype.checkConfirmed = function (trs, cb) {
 
 /**
  * Checks if balance is less than amount for sender.
- * @implements {bignum}
  * @param {number} amount
  * @param {number} balance
  * @param {transaction} trs
@@ -320,8 +302,8 @@ Transaction.prototype.checkConfirmed = function (trs, cb) {
  * @returns {Object} With exceeded boolean and error: address, balance
  */
 Transaction.prototype.checkBalance = function (amount, balance, trs, sender) {
-    var exceededBalance = new bignum(sender[balance].toString()).lessThan(amount);
-    var exceeded = (trs.blockId !== this.scope.genesisblock.block.id && exceededBalance);
+    let exceededBalance = new bignum(sender[balance].toString()).lessThan(amount);
+    let exceeded = (trs.blockId !== this.scope.genesisblock.block.id && exceededBalance);
 
     return {
         exceeded: exceeded,
@@ -333,15 +315,12 @@ Transaction.prototype.checkBalance = function (amount, balance, trs, sender) {
 };
 
 /**
- * Validates parameters.
- * Calls `process` based on trs type (see privateTypes)
- * @see privateTypes
- * @implements {getId}
- * @param {transaction} trs
- * @param {account} sender
- * @param {account} requester
- * @param {function} cb
- * @return {setImmediateCallback} validation errors | trs
+ *
+ * @param trs
+ * @param sender
+ * @param requester
+ * @param cb
+ * @returns {Number}
  */
 Transaction.prototype.process = function (trs, sender, requester, cb) {
     if (typeof requester === 'function') {
@@ -363,7 +342,7 @@ Transaction.prototype.process = function (trs, sender, requester, cb) {
     }
 
     // Get transaction id
-    var txId;
+    let txId;
 
     try {
         txId = this.getId(trs);
@@ -396,30 +375,15 @@ Transaction.prototype.process = function (trs, sender, requester, cb) {
  * Validates parameters.
  * Calls `process` based on trs type (see privateTypes)
  * @see privateTypes
- * @implements {getId}
  * @param {transaction} trs
  * @param {account} sender
  * @param {account} requester
  * @param {function} cb
- * @return {setImmediateCallback} validation errors | trs
+ * @return  validation errors | trs
  */
 Transaction.prototype.verify = function (trs, sender, requester, cb) {
-    var valid = false;
-    var err = null;
-
-    if (typeof requester === 'function') {
-        cb = requester;
-    }
-
-    // Check sender
-    if (!sender) {
-        return setImmediate(cb, 'Missing sender');
-    }
-
-    // Check transaction type
-    if (!__private.types[trs.type]) {
-        return setImmediate(cb, 'Unknown transaction type ' + trs.type);
-    }
+    let valid = false;
+    let err = null;
 
     // Check for missing sender second signature
     if (!trs.requesterPublicKey && sender.secondSignature && !trs.signSignature && trs.blockId !== this.scope.genesisblock.block.id) {
@@ -441,35 +405,13 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
         return setImmediate(cb, 'Requester does not have a second signature');
     }
 
-    // Check sender public key
-    if (sender.publicKey && sender.publicKey !== trs.senderPublicKey) {
-        err = ['Invalid sender public key:', trs.senderPublicKey, 'expected:', sender.publicKey].join(' ');
-
-        if (exceptions.senderPublicKey.indexOf(trs.id) > -1) {
-            this.scope.logger.debug(err);
-            this.scope.logger.debug(JSON.stringify(trs));
-        } else {
-            return setImmediate(cb, err);
-        }
-    }
-
-    // Check sender is not genesis account unless block id equals genesis
-    if ([exceptions.genesisPublicKey.mainnet, exceptions.genesisPublicKey.testnet].indexOf(sender.publicKey) !== -1 && trs.blockId !== this.scope.genesisblock.block.id) {
-        return setImmediate(cb, 'Invalid sender. Can not send from genesis account');
-    }
-
-    // Check sender address
-    if (String(trs.senderId).toUpperCase() !== String(sender.address).toUpperCase()) {
-        return setImmediate(cb, 'Invalid sender address');
-    }
-
     // Determine multisignatures from sender or transaction asset
-    var multisignatures = sender.multisignatures || [];
+    let multisignatures = sender.multisignatures || [];
     if (multisignatures.length === 0) {
         if (trs.asset && trs.asset.multisignature && trs.asset.multisignature.keysgroup) {
 
-            for (var i = 0; i < trs.asset.multisignature.keysgroup.length; i++) {
-                var key = trs.asset.multisignature.keysgroup[i];
+            for (let i = 0; i < trs.asset.multisignature.keysgroup.length; i++) {
+                let key = trs.asset.multisignature.keysgroup[i];
 
                 if (!key || typeof key !== 'string') {
                     return setImmediate(cb, 'Invalid member in keysgroup');
@@ -498,19 +440,6 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
         return setImmediate(cb, e.toString());
     }
 
-    if (!valid) {
-        err = 'Failed to verify signature';
-
-        if (exceptions.signatures.indexOf(trs.id) > -1) {
-            this.scope.logger.debug(err);
-            this.scope.logger.debug(JSON.stringify(trs));
-            valid = true;
-            err = null;
-        } else {
-            return setImmediate(cb, err);
-        }
-    }
-
     // Verify second signature
     if (requester.secondSignature || sender.secondSignature) {
         try {
@@ -527,7 +456,7 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
 
     // Check that signatures are unique
     if (trs.signatures && trs.signatures.length) {
-        var signatures = trs.signatures.reduce(function (p, c) {
+        let signatures = trs.signatures.reduce(function (p, c) {
             if (p.indexOf(c) < 0) {
                 p.push(c);
             }
@@ -541,10 +470,10 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
 
     // Verify multisignatures
     if (trs.signatures) {
-        for (var d = 0; d < trs.signatures.length; d++) {
+        for (let d = 0; d < trs.signatures.length; d++) {
             valid = false;
 
-            for (var s = 0; s < multisignatures.length; s++) {
+            for (let s = 0; s < multisignatures.length; s++) {
                 if (trs.requesterPublicKey && multisignatures[s] === trs.requesterPublicKey) {
                     continue;
                 }
@@ -561,8 +490,8 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
     }
 
     // Calculate fee
-    var fee = __private.types[trs.type].calculateFee.call(this, trs, sender);
-    if (fee !== 0 && !fee || trs.fee !== fee) {
+    let fee = __private.types[trs.type].calculateFee.call(this, trs, sender);
+    if (trs.fee !== fee) {
         return setImmediate(cb, 'Invalid transaction fee');
     }
 
@@ -572,8 +501,8 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
     }
 
     // Check confirmed sender balance
-    var amount = new bignum(trs.amount.toString()).plus(trs.fee.toString());
-    var senderBalance = this.checkBalance(amount, 'balance', trs, sender);
+    let amount = new bignum(trs.amount.toString()).plus(trs.fee.toString());
+    let senderBalance = this.checkBalance(amount, 'balance', trs, sender);
 
     if (senderBalance.exceeded) {
         return setImmediate(cb, senderBalance.error);
@@ -597,8 +526,6 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
 
 /**
  * Verifies signature for valid transaction type
- * @implements {getBytes}
- * @implements {verifyBytes}
  * @param {transaction} trs
  * @param {publicKey} publicKey
  * @param {signature} signature
@@ -606,18 +533,14 @@ Transaction.prototype.verify = function (trs, sender, requester, cb) {
  * @throws {error}
  */
 Transaction.prototype.verifySignature = function (trs, publicKey, signature) {
-    if (!__private.types[trs.type]) {
-        throw 'Unknown transaction type ' + trs.type;
-    }
-
     if (!signature) {
         return false;
     }
 
-    var res;
+    let res;
 
     try {
-        var bytes = this.getBytes(trs, true, true);
+        let bytes = this.getBytes(trs, true, true);
         res = this.verifyBytes(bytes, publicKey, signature);
     } catch (e) {
         throw e;
@@ -628,8 +551,6 @@ Transaction.prototype.verifySignature = function (trs, publicKey, signature) {
 
 /**
  * Verifies second signature for valid transaction type
- * @implements {getBytes}
- * @implements {verifyBytes}
  * @param {transaction} trs
  * @param {publicKey} publicKey
  * @param {signature} signature
@@ -645,10 +566,10 @@ Transaction.prototype.verifySecondSignature = function (trs, publicKey, signatur
         return false;
     }
 
-    var res;
+    let res;
 
     try {
-        var bytes = this.getBytes(trs, false, true);
+        let bytes = this.getBytes(trs, false, true);
         res = this.verifyBytes(bytes, publicKey, signature);
     } catch (e) {
         throw e;
@@ -659,8 +580,6 @@ Transaction.prototype.verifySecondSignature = function (trs, publicKey, signatur
 
 /**
  * Verifies hash, publicKey and signature.
- * @implements {crypto.createHash}
- * @implements {scope.ed.verify}
  * @param {Array} bytes
  * @param {publicKey} publicKey
  * @param {signature} signature
@@ -668,18 +587,18 @@ Transaction.prototype.verifySecondSignature = function (trs, publicKey, signatur
  * @throws {error}
  */
 Transaction.prototype.verifyBytes = function (bytes, publicKey, signature) {
-    var res;
+    let res;
 
     try {
-        var data2 = Buffer.alloc(bytes.length);
+        let data2 = Buffer.alloc(bytes.length);
 
-        for (var i = 0; i < data2.length; i++) {
+        for (let i = 0; i < data2.length; i++) {
             data2[i] = bytes[i];
         }
 
-        var hash = crypto.createHash('sha256').update(data2).digest();
-        var signatureBuffer = Buffer.from(signature, 'hex');
-        var publicKeyBuffer = Buffer.from(publicKey, 'hex');
+        let hash = crypto.createHash('sha256').update(data2).digest();
+        let signatureBuffer = Buffer.from(signature, 'hex');
+        let publicKeyBuffer = Buffer.from(publicKey, 'hex');
 
         res = this.scope.ed.verify(hash, signatureBuffer || ' ', publicKeyBuffer || ' ');
     } catch (e) {
@@ -692,14 +611,11 @@ Transaction.prototype.verifyBytes = function (bytes, publicKey, signature) {
 /**
  * Merges account into sender address, Calls `apply` based on trs type (privateTypes).
  * @see privateTypes
- * @implements {checkBalance}
- * @implements {account.merge}
- * @implements {modules.rounds.calc}
  * @param {transaction} trs
  * @param {block} block
  * @param {account} sender
  * @param {function} cb - Callback function
- * @return {setImmediateCallback} for errors | cb
+ * @return  for errors | cb
  */
 Transaction.prototype.apply = function (trs, block, sender, cb) {
     if (!this.ready(trs, sender)) {
@@ -707,8 +623,8 @@ Transaction.prototype.apply = function (trs, block, sender, cb) {
     }
 
     // Check confirmed sender balance
-    var amount = new bignum(trs.amount.toString()).plus(trs.fee.toString());
-    var senderBalance = this.checkBalance(amount, 'balance', trs, sender);
+    let amount = new bignum(trs.amount.toString()).plus(trs.fee.toString());
+    let senderBalance = this.checkBalance(amount, 'balance', trs, sender);
 
     if (senderBalance.exceeded) {
         return setImmediate(cb, senderBalance.error);
@@ -753,17 +669,14 @@ Transaction.prototype.apply = function (trs, block, sender, cb) {
 /**
  * Merges account into sender address, Calls `undo` based on trs type (privateTypes).
  * @see privateTypes
- * @implements {bignum}
- * @implements {account.merge}
- * @implements {modules.rounds.calc}
  * @param {transaction} trs
  * @param {block} block
  * @param {account} sender
  * @param {function} cb - Callback function
- * @return {setImmediateCallback} for errors | cb
+ * @return  for errors | cb
  */
 Transaction.prototype.undo = function (trs, block, sender, cb) {
-    var amount = new bignum(trs.amount.toString());
+    let amount = new bignum(trs.amount.toString());
     amount = amount.plus(trs.fee.toString()).toNumber();
 
     this.scope.logger.trace('Logic/Transaction->undo', {
@@ -803,14 +716,11 @@ Transaction.prototype.undo = function (trs, block, sender, cb) {
  * Calls `applyUnconfirmed` based on trs type (privateTypes). If error merge
  * account with amount.
  * @see privateTypes
- * @implements {bignum}
- * @implements {checkBalance}
- * @implements {account.merge}
  * @param {transaction} trs
  * @param {account} sender
  * @param {account} requester
  * @param {function} cb - Callback function
- * @return {setImmediateCallback} for errors | cb
+ * @return  for errors | cb
  */
 Transaction.prototype.applyUnconfirmed = function (trs, sender, requester, cb) {
     if (typeof requester === 'function') {
@@ -818,8 +728,8 @@ Transaction.prototype.applyUnconfirmed = function (trs, sender, requester, cb) {
     }
 
     // Check unconfirmed sender balance
-    var amount = new bignum(trs.amount.toString()).plus(trs.fee.toString());
-    var senderBalance = this.checkBalance(amount, 'u_balance', trs, sender);
+    let amount = new bignum(trs.amount.toString()).plus(trs.fee.toString());
+    let senderBalance = this.checkBalance(amount, 'u_balance', trs, sender);
 
     if (senderBalance.exceeded) {
         return setImmediate(cb, senderBalance.error);
@@ -849,15 +759,13 @@ Transaction.prototype.applyUnconfirmed = function (trs, sender, requester, cb) {
  * Calls `undoUnconfirmed` based on trs type (privateTypes). If error merge
  * account with megative amount.
  * @see privateTypes
- * @implements {bignum}
- * @implements {account.merge}
  * @param {transaction} trs
  * @param {account} sender
  * @param {function} cb - Callback function
- * @return {setImmediateCallback} for errors | cb
+ * @return  for errors | cb
  */
 Transaction.prototype.undoUnconfirmed = function (trs, sender, cb) {
-    var amount = new bignum(trs.amount.toString());
+    let amount = new bignum(trs.amount.toString());
     amount = amount.plus(trs.fee.toString()).toNumber();
 
     this.scope.account.merge(sender.address, {u_balance: amount}, function (err, sender) {
@@ -907,7 +815,7 @@ Transaction.prototype.dbSave = function (trs) {
         throw 'Unknown transaction type ' + trs.type;
     }
 
-    var senderPublicKey, signature, signSignature, requesterPublicKey;
+    let senderPublicKey, signature, signSignature, requesterPublicKey;
 
     try {
         senderPublicKey = Buffer.from(trs.senderPublicKey, 'hex');
@@ -918,7 +826,7 @@ Transaction.prototype.dbSave = function (trs) {
         throw e;
     }
 
-    var promises = [
+    let promises = [
         {
             table: this.dbTable,
             fields: this.dbFields,
@@ -940,7 +848,7 @@ Transaction.prototype.dbSave = function (trs) {
         }
     ];
 
-    var promise = __private.types[trs.type].dbSave(trs);
+    let promise = __private.types[trs.type].dbSave(trs);
 
     if (promise) {
         promises.push(promise);
@@ -954,10 +862,10 @@ Transaction.prototype.dbSave = function (trs) {
  * @see privateTypes
  * @param {transaction} trs
  * @param {function} cb
- * @return {setImmediateCallback} error string | cb
+ * @return  error string | cb
  */
 Transaction.prototype.afterSave = function (trs, cb) {
-    var tx_type = __private.types[trs.type];
+    let tx_type = __private.types[trs.type];
 
     if (!tx_type) {
         return setImmediate(cb, 'Unknown transaction type ' + trs.type);
@@ -970,30 +878,6 @@ Transaction.prototype.afterSave = function (trs, cb) {
     }
 };
 
-/**
- * @typedef {Object} transaction
- * @property {string} id
- * @property {number} height
- * @property {string} blockId
- * @property {number} type
- * @property {number} timestamp
- * @property {publicKey} senderPublicKey
- * @property {publicKey} requesterPublicKey
- * @property {string} senderId
- * @property {string} recipientId
- * @property {number} amount
- * @property {number} fee
- * @property {string} signature
- * @property {string} signSignature
- * @property {Object} asset
- * @property {multisignature} [asset.multisignature]
- * @property {signature} [asset.signature]
- * @property {dapp} [asset.dapp]
- * @property {Object} [asset.outTransfer] - Contains dappId and transactionId
- * @property {Object} [asset.inTransfer] - Contains dappId
- * @property {votes} [asset.votes] - Contains multiple votes to a transactionId
- *
- */
 Transaction.prototype.schema = {
     id: 'Transaction',
     type: 'object',
@@ -1065,25 +949,18 @@ Transaction.prototype.schema = {
 };
 
 /**
- * Calls `objectNormalize` based on trs type (privateTypes).
- * @see privateTypes
- * @implements {scope.schema.validate}
- * @param {transaction} trs
- * @return {error|transaction} error string | trs normalized
- * @throws {string} error message
+ * Normalizes transaction
+ * @param trs
+ * @returns {*}
  */
 Transaction.prototype.objectNormalize = function (trs) {
-    if (!__private.types[trs.type]) {
-        throw 'Unknown transaction type ' + trs.type;
-    }
-
-    for (var i in trs) {
+    for (let i in trs) {
         if (trs[i] === null || typeof trs[i] === 'undefined') {
             delete trs[i];
         }
     }
 
-    var report = this.scope.schema.validate(trs, Transaction.prototype.schema);
+    let report = this.scope.schema.validate(trs, Transaction.prototype.schema);
 
     if (!report) {
         throw 'Failed to validate transaction schema: ' + this.scope.schema.getLastErrors().map(function (err) {
@@ -1111,7 +988,7 @@ Transaction.prototype.dbRead = function (raw) {
     if (!raw.t_id) {
         return null;
     } else {
-        var tx = {
+        let tx = {
             id: raw.t_id,
             height: raw.b_height,
             blockId: raw.b_id || raw.t_blockId,
@@ -1135,7 +1012,7 @@ Transaction.prototype.dbRead = function (raw) {
             throw 'Unknown transaction type ' + tx.type;
         }
 
-        var asset = __private.types[tx.type].dbRead.call(this, raw);
+        let asset = __private.types[tx.type].dbRead.call(this, raw);
 
         if (asset) {
             tx.asset = extend(tx.asset, asset);

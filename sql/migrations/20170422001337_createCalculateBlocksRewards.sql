@@ -25,11 +25,11 @@ CREATE FUNCTION getBlockRewards() RETURNS blockRewards LANGUAGE PLPGSQL IMMUTABL
 		start      int        = 1451520; -- Start rewards at block (n)
 		distance   bigint     = 3000000; -- Distance between each milestone
 		milestones bigint[] = ARRAY[   -- Milestones
-			500000000, -- Initial Reward
-			400000000, -- Milestone 1
-			300000000, -- Milestone 2
-			200000000, -- Milestone 3
-			100000000  -- Milestone 4
+			0, -- Initial Reward
+			0, -- Milestone 1
+			0, -- Milestone 2
+			0, -- Milestone 3
+			0  -- Milestone 4
 		];
 	BEGIN
 		res.supply     = supply;

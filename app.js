@@ -90,7 +90,7 @@ let config = {
     db: appConfig.db,
     cache: appConfig.redis,
     cacheEnabled: appConfig.cacheEnabled,
-    ipfs:appConfig.ipfs,
+    ipfs: appConfig.ipfs,
     modules: {
         server: './modules/server.js',
         accounts: './modules/accounts.js',
@@ -110,17 +110,17 @@ let config = {
         cache: './modules/cache.js'
     },
     api: {
-        accounts: {http: './api/http/accounts.js'},
-        blocks: {http: './api/http/blocks.js'},
-        dapps: {http: './api/http/dapps.js'},
-        delegates: {http: './api/http/delegates.js'},
-        loader: {http: './api/http/loader.js'},
-        multisignatures: {http: './api/http/multisignatures.js'},
-        peers: {http: './api/http/peers.js'},
-        server: {http: './api/http/server.js'},
-        signatures: {http: './api/http/signatures.js'},
-        transactions: {http: './api/http/transactions.js'},
-        transport: {http: './api/http/transport.js'}
+        accounts: {http: './api/accounts.js'},
+        blocks: {http: './api/blocks.js'},
+        dapps: {http: './api/dapps.js'},
+        delegates: {http: './api/delegates.js'},
+        loader: {http: './api/loader.js'},
+        multisignatures: {http: './api/multisignatures.js'},
+        peers: {http: './api/peers.js'},
+        server: {http: './api/server.js'},
+        signatures: {http: './api/signatures.js'},
+        transactions: {http: './api/transactions.js'},
+        transport: {http: './api/transport.js'}
     }
 };
 
@@ -335,19 +335,13 @@ d.run(function () {
 
             scope.network.app.use(httpApi.middleware.logClientConnections.bind(null, scope.logger));
 
-            /* Instruct browser to deny display of <frame>, <iframe> regardless of origin.
-             *
-             * RFC -> https://tools.ietf.org/html/rfc7034
-             */
+            //DENY: 表示该页面不允许在 frame 中展示，即便是在相同域名的页面中嵌套也不允许。
             scope.network.app.use(httpApi.middleware.attachResponseHeader.bind(null, 'X-Frame-Options', 'DENY'));
-            /* Set Content-Security-Policy headers.
-             *
-             * frame-ancestors - Defines valid sources for <frame>, <iframe>, <object>, <embed> or <applet>.
-             *
-             * W3C Candidate Recommendation -> https://www.w3.org/TR/CSP/
-             */
+
+            // 限制嵌入框架的网页
             scope.network.app.use(httpApi.middleware.attachResponseHeader.bind(null, 'Content-Security-Policy', 'frame-ancestors \'none\''));
 
+            // API调用权限控制
             scope.network.app.use(httpApi.middleware.applyAPIAccessRules.bind(null, scope.config));
 
             cb();
@@ -371,6 +365,7 @@ d.run(function () {
                         if (typeof(module[eventName]) === 'function') {
                             module[eventName].apply(module[eventName], args);
                         }
+                        //执行子模块里面的方法
                         if (module.submodules) {
                             async.each(module.submodules, function (submodule) {
                                 if (submodule && typeof(submodule[eventName]) === 'function') {
@@ -383,28 +378,30 @@ d.run(function () {
             };
             cb(null, new bus());
         }],
+
         db: function (cb) {
             let db = require('./helpers/database.js');
             db.connect(config.db, logger, cb);
         },
+
         /**
-         * It tries to connect with redis server based on config. provided in config.json file
-         * @param {function} cb
+         * 连接redis
+         * @param cb
          */
         cache: function (cb) {
             let cache = require('./helpers/cache.js');
             cache.connect(config.cacheEnabled, config.cache, logger, cb);
         },
 
+        /**
+         * 连接ipfs
+         * @param cb
+         */
         ipfs: function (cb) {
             let ipfs = require('./helpers/fileStorage.js');
             ipfs.connect(config.ipfs, logger, cb);
         },
 
-        /**
-         * Once db, bus, schema and genesisblock are completed,
-         * loads transaction, block, account and peers from logic folder.
-         */
         logic: ['db', 'bus', 'schema', 'genesisblock', function (scope, cb) {
             let Transaction = require('./logic/transaction.js');
             let Block = require('./logic/block.js');
@@ -448,9 +445,7 @@ d.run(function () {
         }],
 
         modules: ['network', 'connect', 'config', 'logger', 'bus', 'sequence', 'dbSequence', 'balancesSequence', 'db', 'logic', 'ipfs', 'cache', function (scope, cb) {
-
             let tasks = {};
-
             Object.keys(config.modules).forEach(function (name) {
                 tasks[name] = function (cb) {
                     let d = require('domain').create();

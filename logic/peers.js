@@ -1,15 +1,15 @@
 'use strict';
 
-var _ = require('lodash');
-var async = require('async');
-var Peer = require('../logic/peer.js');
-var schema = require('../schema/peers.js');
+const _ = require('lodash');
+const async = require('async');
+const Peer = require('../logic/peer.js');
+const schema = require('../schema/peers.js');
 
 // Private fields
-var __private = {};
-var self;
-var library;
-var modules;
+let __private = {};
+let self;
+let library;
+let modules;
 
 /**
  * Initializes library.
@@ -18,7 +18,7 @@ var modules;
  * @classdesc Main peers logic.
  * @param {Object} logger
  * @param {function} cb - Callback function.
- * @return {setImmediateCallback} Callback function with `this` as data.
+ * @return Callback function with `this` as data.
  */
 // Constructor
 function Peers(logger, cb) {
@@ -75,7 +75,7 @@ Peers.prototype.get = function (peer) {
  */
 Peers.prototype.upsert = function (peer, insertOnly) {
     // Insert new peer
-    var insert = function (peer) {
+    let insert = function (peer) {
         if (!_.isEmpty(modules.peers.acceptable([peer]))) {
             peer.updated = Date.now();
             __private.peers[peer.string] = peer;
@@ -86,10 +86,10 @@ Peers.prototype.upsert = function (peer, insertOnly) {
     };
 
     // Update existing peer
-    var update = function (peer) {
+    let update = function (peer) {
         peer.updated = Date.now();
 
-        var diff = {};
+        let diff = {};
         _.each(peer, function (value, key) {
             if (key !== 'updated' && __private.peers[peer.string][key] !== value) {
                 diff[key] = value;
@@ -125,10 +125,10 @@ Peers.prototype.upsert = function (peer, insertOnly) {
     }
 
     // Stats for tracking changes
-    var cnt_total = 0;
-    var cnt_active = 0;
-    var cnt_empty_height = 0;
-    var cnt_empty_broadhash = 0;
+    let cnt_total = 0;
+    let cnt_active = 0;
+    let cnt_empty_height = 0;
+    let cnt_empty_broadhash = 0;
 
     _.each(__private.peers, function (peer, index) {
         ++cnt_total;
