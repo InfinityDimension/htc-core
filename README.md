@@ -6,7 +6,7 @@
 
   `sudo apt-get install -y python build-essential curl automake autoconf libtool libtool-bin`
 
-- Git (<https://github.com/git/git>) -- Used for cloning and updating Lisk
+- Git (<https://github.com/git/git>) -- Used for cloning and updating caritas
 
   `sudo apt-get install -y git`
 
