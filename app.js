@@ -107,7 +107,8 @@ let config = {
         dapps: './modules/dapps.js',
         crypto: './modules/crypto.js',
         sql: './modules/sql.js',
-        cache: './modules/cache.js'
+        cache: './modules/cache.js',
+        uia:'./modules/uia.js',
     },
     api: {
         accounts: {http: './api/accounts.js'},

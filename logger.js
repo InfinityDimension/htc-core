@@ -21,13 +21,13 @@ module.exports = function (config) {
     };
 
     config.level_abbr = config.level_abbr || {
-        trace: 'trc',
-        debug: 'dbg',
+        trace: 'trace',
+        debug: 'debug',
         log: 'log',
-        info: 'inf',
-        warn: 'WRN',
-        error: 'ERR',
-        fatal: 'FTL'
+        info: 'info',
+        warn: 'warn',
+        error: 'error',
+        fatal: 'fatal'
     };
 
     config.filename = config.filename || __dirname + '/logs.log';
