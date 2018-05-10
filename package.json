@@ -56,7 +56,7 @@
     "chai-bignumber": "=2.0.2",
     "crypto-browserify": "=3.12.0",
     "mocha": "=4.0.1",
-    "moment": "=2.19.1",
+    "moment": "=2.19.3",
     "supertest": "=3.0.0"
   }
 }
