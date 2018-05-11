@@ -1,6 +1,0 @@
-[submodule "public"]
-	path = public
-	url = https://github.com/CaritasChain/caritas-ui.git
-[submodule "test/caritas-js"]
-	path = test/caritas-js
-	url = https://github.com/CaritasChain/caritas-js.git
