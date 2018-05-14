@@ -31,8 +31,8 @@
 - Install PostgreSQL (version 9.6.2):
 
   ```
-sudo apt-get install -y postgresql postgresql-contrib libpq-dev
-sudo -u postgres createuser --createdb $USER
-createdb htc_test
-sudo -u postgres psql -d htc_test -c "alter user "$USER" with password 'password';"
+  sudo apt-get install -y postgresql postgresql-contrib libpq-dev
+  sudo -u postgres createuser --createdb $USER
+  createdb htc_test
+  sudo -u postgres psql -d htc_test -c "alter user "$USER" with password 'password';"
   ```
