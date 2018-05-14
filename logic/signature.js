@@ -15,11 +15,11 @@ var modules, library;
  * @param {Object} logger
  */
 // Constructor
-function Signature(schema, logger) {
-    library = {
-        schema: schema,
-        logger: logger,
-    };
+function Signature (schema, logger) {
+	library ={
+		schema: schema,
+		logger: logger,
+	};
 }
 
 /**
@@ -27,9 +27,9 @@ function Signature(schema, logger) {
  * @param {Accounts} accounts
  */
 Signature.prototype.bind = function (accounts) {
-    modules = {
-        accounts: accounts,
-    };
+	modules = {
+		accounts: accounts,
+	};
 };
 
 /**
@@ -39,13 +39,13 @@ Signature.prototype.bind = function (accounts) {
  * @returns {transaction} trs with new data
  */
 Signature.prototype.create = function (data, trs) {
-    trs.recipientId = null;
-    trs.amount = 0;
-    trs.asset.signature = {
-        publicKey: data.secondKeypair.publicKey.toString('hex')
-    };
+	trs.recipientId = null;
+	trs.amount = 0;
+	trs.asset.signature = {
+		publicKey: data.secondKeypair.publicKey.toString('hex')
+	};
 
-    return trs;
+	return trs;
 };
 
 /**
@@ -56,37 +56,37 @@ Signature.prototype.create = function (data, trs) {
  * @returns {number} Secondsignature fee.
  */
 Signature.prototype.calculateFee = function (trs, sender) {
-    return constants.fees.secondsignature;
+	return constants.fees.secondsignature;
 };
 
 /**
  * Verifies signature fields from transaction asset and sender.
  * @implements module:transactions#Transaction~verifySignature
- * @param {transaction} trs
+ * @param {transaction} trs 
  * @param {account} sender
  * @param {function} cb - Callback function.
- * @returns {setImmediateCallback|transaction} returns error string if invalid parameter |
+ * @returns {setImmediateCallback|transaction} returns error string if invalid parameter | 
  * trs validated.
  */
 Signature.prototype.verify = function (trs, sender, cb) {
-    if (!trs.asset || !trs.asset.signature) {
-        return setImmediate(cb, 'Invalid transaction asset');
-    }
+	if (!trs.asset || !trs.asset.signature) {
+		return setImmediate(cb, 'Invalid transaction asset');
+	}
 
-    if (trs.amount !== 0) {
-        return setImmediate(cb, 'Invalid transaction amount');
-    }
+	if (trs.amount !== 0) {
+		return setImmediate(cb, 'Invalid transaction amount');
+	}
 
-    try {
-        if (!trs.asset.signature.publicKey || Buffer.from(trs.asset.signature.publicKey, 'hex').length !== 32) {
-            return setImmediate(cb, 'Invalid public key');
-        }
-    } catch (e) {
-        library.logger.error(e.stack);
-        return setImmediate(cb, 'Invalid public key');
-    }
+	try {
+		if (!trs.asset.signature.publicKey || Buffer.from(trs.asset.signature.publicKey, 'hex').length !== 32) {
+			return setImmediate(cb, 'Invalid public key');
+		}
+	} catch (e) {
+		library.logger.error(e.stack);
+		return setImmediate(cb, 'Invalid public key');
+	}
 
-    return setImmediate(cb, null, trs);
+	return setImmediate(cb, null, trs);
 };
 
 /**
@@ -98,7 +98,7 @@ Signature.prototype.verify = function (trs, sender, cb) {
  * @todo check extra parameter sender.
  */
 Signature.prototype.process = function (trs, sender, cb) {
-    return setImmediate(cb, null, trs);
+	return setImmediate(cb, null, trs);
 };
 
 /**
@@ -111,21 +111,21 @@ Signature.prototype.process = function (trs, sender, cb) {
  * @todo check if this function is called.
  */
 Signature.prototype.getBytes = function (trs) {
-    var bb;
+	var bb;
 
-    try {
-        bb = new ByteBuffer(32, true);
-        var publicKeyBuffer = Buffer.from(trs.asset.signature.publicKey, 'hex');
+	try {
+		bb = new ByteBuffer(32, true);
+		var publicKeyBuffer = Buffer.from(trs.asset.signature.publicKey, 'hex');
 
-        for (var i = 0; i < publicKeyBuffer.length; i++) {
-            bb.writeByte(publicKeyBuffer[i]);
-        }
+		for (var i = 0; i < publicKeyBuffer.length; i++) {
+			bb.writeByte(publicKeyBuffer[i]);
+		}
 
-        bb.flip();
-    } catch (e) {
-        throw e;
-    }
-    return bb.toBuffer();
+		bb.flip();
+	} catch (e) {
+		throw e;
+	}
+	return bb.toBuffer();
 };
 
 /**
@@ -138,73 +138,73 @@ Signature.prototype.getBytes = function (trs) {
  * @return {setImmediateCallback} for errors
  */
 Signature.prototype.apply = function (trs, block, sender, cb) {
-    modules.accounts.setAccountAndGet({
-        address: sender.address,
-        secondSignature: 1,
-        u_secondSignature: 0,
-        secondPublicKey: trs.asset.signature.publicKey
-    }, cb);
+	modules.accounts.setAccountAndGet({
+		address: sender.address,
+		secondSignature: 1,
+		u_secondSignature: 0,
+		secondPublicKey: trs.asset.signature.publicKey
+	}, cb);
 };
 
 /**
  * Sets account second signature to null.
  * @implements module:accounts#Accounts~setAccountAndGet
  * @param {transaction} trs - Unnecessary parameter.
- * @param {block} block - Unnecessary parameter.
+ * @param {block} block - Unnecessary parameter. 
  * @param {account} sender
  * @param {function} cb - Callback function.
  */
 Signature.prototype.undo = function (trs, block, sender, cb) {
-    modules.accounts.setAccountAndGet({
-        address: sender.address,
-        secondSignature: 0,
-        u_secondSignature: 1,
-        secondPublicKey: null
-    }, cb);
+	modules.accounts.setAccountAndGet({
+		address: sender.address,
+		secondSignature: 0,
+		u_secondSignature: 1,
+		secondPublicKey: null
+	}, cb);
 };
 
 /**
  * Activates unconfirmed second signature for sender account.
  * @implements module:accounts#Accounts~setAccountAndGet
  * @param {transaction} trs - Unnecessary parameter.
- * @param {block} block - Unnecessary parameter.
+ * @param {block} block - Unnecessary parameter. 
  * @param {account} sender
  * @param {function} cb - Callback function.
  * @return {setImmediateCallback} Error if second signature is already enabled.
  */
 Signature.prototype.applyUnconfirmed = function (trs, sender, cb) {
-    if (sender.u_secondSignature || sender.secondSignature) {
-        return setImmediate(cb, 'Second signature already enabled');
-    }
+	if (sender.u_secondSignature || sender.secondSignature) {
+		return setImmediate(cb, 'Second signature already enabled');
+	}
 
-    modules.accounts.setAccountAndGet({address: sender.address, u_secondSignature: 1}, cb);
+	modules.accounts.setAccountAndGet({address: sender.address, u_secondSignature: 1}, cb);
 };
 
 /**
  * Deactivates unconfirmed second signature for sender account.
  * @implements module:accounts#Accounts~setAccountAndGet
  * @param {transaction} trs - Unnecessary parameter.
- * @param {block} block - Unnecessary parameter.
+ * @param {block} block - Unnecessary parameter. 
  * @param {account} sender
  * @param {function} cb - Callback function.
  */
 Signature.prototype.undoUnconfirmed = function (trs, sender, cb) {
-    modules.accounts.setAccountAndGet({address: sender.address, u_secondSignature: 0}, cb);
+	modules.accounts.setAccountAndGet({address: sender.address, u_secondSignature: 0}, cb);
 };
 /**
  * @typedef signature
  * @property {publicKey} publicKey
  */
 Signature.prototype.schema = {
-    id: 'Signature',
-    object: true,
-    properties: {
-        publicKey: {
-            type: 'string',
-            format: 'publicKey'
-        }
-    },
-    required: ['publicKey']
+	id: 'Signature',
+	object: true,
+	properties: {
+		publicKey: {
+			type: 'string',
+			format: 'publicKey'
+		}
+	},
+	required: ['publicKey']
 };
 
 /**
@@ -214,15 +214,15 @@ Signature.prototype.schema = {
  * @throws {string} Error message.
  */
 Signature.prototype.objectNormalize = function (trs) {
-    var report = library.schema.validate(trs.asset.signature, Signature.prototype.schema);
+	var report = library.schema.validate(trs.asset.signature, Signature.prototype.schema);
 
-    if (!report) {
-        throw 'Failed to validate signature schema: ' + this.scope.schema.getLastErrors().map(function (err) {
-            return err.message;
-        }).join(', ');
-    }
+	if (!report) {
+		throw 'Failed to validate signature schema: ' + this.scope.schema.getLastErrors().map(function (err) {
+			return err.message;
+		}).join(', ');
+	}
 
-    return trs;
+	return trs;
 };
 
 /**
@@ -232,23 +232,23 @@ Signature.prototype.objectNormalize = function (trs) {
  * @todo check if this function is called.
  */
 Signature.prototype.dbRead = function (raw) {
-    if (!raw.s_publicKey) {
-        return null;
-    } else {
-        var signature = {
-            transactionId: raw.t_id,
-            publicKey: raw.s_publicKey
-        };
+	if (!raw.s_publicKey) {
+		return null;
+	} else {
+		var signature = {
+			transactionId: raw.t_id,
+			publicKey: raw.s_publicKey
+		};
 
-        return {signature: signature};
-    }
+		return {signature: signature};
+	}
 };
 
 Signature.prototype.dbTable = 'signatures';
 
 Signature.prototype.dbFields = [
-    'transactionId',
-    'publicKey'
+	'transactionId',
+	'publicKey'
 ];
 
 /**
@@ -258,22 +258,22 @@ Signature.prototype.dbFields = [
  * @todo check if this function is called.
  */
 Signature.prototype.dbSave = function (trs) {
-    var publicKey;
+	var publicKey;
 
-    try {
-        publicKey = Buffer.from(trs.asset.signature.publicKey, 'hex');
-    } catch (e) {
-        throw e;
-    }
+	try {
+		publicKey = Buffer.from(trs.asset.signature.publicKey, 'hex');
+	} catch (e) {
+		throw e;
+	}
 
-    return {
-        table: this.dbTable,
-        fields: this.dbFields,
-        values: {
-            transactionId: trs.id,
-            publicKey: publicKey
-        }
-    };
+	return {
+		table: this.dbTable,
+		fields: this.dbFields,
+		values: {
+			transactionId: trs.id,
+			publicKey: publicKey
+		}
+	};
 };
 
 /**
@@ -284,14 +284,14 @@ Signature.prototype.dbSave = function (trs) {
  * @todo validate this logic, check if this function is called.
  */
 Signature.prototype.ready = function (trs, sender) {
-    if (Array.isArray(sender.multisignatures) && sender.multisignatures.length) {
-        if (!Array.isArray(trs.signatures)) {
-            return false;
-        }
-        return trs.signatures.length >= sender.multimin;
-    } else {
-        return true;
-    }
+	if (Array.isArray(sender.multisignatures) && sender.multisignatures.length) {
+		if (!Array.isArray(trs.signatures)) {
+			return false;
+		}
+		return trs.signatures.length >= sender.multimin;
+	} else {
+		return true;
+	}
 };
 
 // Export

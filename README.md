@@ -1,16 +1,25 @@
-# caritas
+# Htc
 
-## Prerequisites
+**NOTE:** The following information is applicable to: **Ubuntu 14.04, 16.04 (LTS) or 16.10 - x86_64**.
+
+## Prerequisites - In order
 
 - Tool chain components -- Used for compiling dependencies
 
-  `sudo apt-get install -y python build-essential curl automake autoconf libtool libtool-bin`
+  `sudo apt-get install -y python build-essential curl automake autoconf libtool`
 
-- Git (<https://github.com/git/git>) -- Used for cloning and updating caritas
+- Git
 
   `sudo apt-get install -y git`
 
-- Node.js
+- Node.js (<https://nodejs.org/>) -- Node.js serves as the underlying engine for code execution.
+
+  System wide via package manager:
+
+  ```
+  curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+  ```
 
   Locally using [nvm](https://github.com/creationix/nvm):
 
@@ -22,50 +31,8 @@
 - Install PostgreSQL (version 9.6.2):
 
   ```
-  sudo apt-get install -y postgresql postgresql-contrib libpq-dev
-  sudo -u postgres createuser --createdb $USER
-  createdb caritas_test
-  sudo -u postgres psql -d caritas_test -c "alter user "$USER" with password 'password';"
+sudo apt-get install -y postgresql postgresql-contrib libpq-dev
+sudo -u postgres createuser --createdb $USER
+createdb htc_test
+sudo -u postgres psql -d htc_test -c "alter user "$USER" with password 'password';"
   ```
-
-- Bower (<http://bower.io/>) -- Bower helps to install required JavaScript dependencies.
-
-  `npm install -g bower`
-
-- Grunt.js (<http://gruntjs.com/>) -- Grunt is used to compile the frontend code and serves other functions.
-
-  `npm install -g grunt-cli`
-
-- PM2 (<https://github.com/Unitech/pm2>) -- PM2 manages the node process for Lisk (Optional)
-
-  `npm install -g pm2`
-
-## Installation Steps
-
-Clone the Lisk repository using Git and initialize the modules.
-
-```
-git clone https://github.com/CaritasChain/caritas.git
-cd caritas
-npm install
-```
-
-Load git submodules
-
-```
-git submodule init
-git submodule update
-```
-
-Build the user-interface:
-
-```
-cd public
-npm install
-bower install --allow-root
-grunt release
-```
-
-## start
-
-`node app.js`
