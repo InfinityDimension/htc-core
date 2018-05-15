@@ -1,7 +1,7 @@
 'use strict';
 
-var Router = require('../helpers/router');
-var httpApi = require('../helpers/httpApi');
+var Router = require('../../helpers/router');
+var httpApi = require('../../helpers/httpApi');
 
 /**
  * Renders main page wallet from public folder.

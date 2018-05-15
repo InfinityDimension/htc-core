@@ -4,7 +4,7 @@
     "version": "0.0.0a",
     "minVersion": "0.0.0a",
     "fileLogLevel": "info",
-    "logFileName": "logs/lisk.log",
+    "logFileName": "logs/htc.log",
     "consoleLogLevel": "debug",
     "trustProxy": false,
     "topAccounts": false,
@@ -12,7 +12,7 @@
     "db": {
         "host": "localhost",
         "port": 5432,
-        "database": "lisk_test",
+        "database": "htc_test",
         "user": "",
         "password": "password",
         "poolSize": 95,
@@ -24,7 +24,7 @@
     },
     "redis": {
         "host": "127.0.0.1",
-        "port": 6380,
+        "port": 6379,
         "db": 0,
         "password": null
     },
@@ -32,7 +32,9 @@
         "enabled": true,
         "access": {
             "public": true,
-            "whiteList": ["127.0.0.1"]
+            "whiteList": [
+                "127.0.0.1"
+            ]
         },
         "options": {
             "limits": {
@@ -45,10 +47,12 @@
     },
     "peers": {
         "enabled": true,
-        "list": [{
-            "ip": "127.0.0.1",
-            "port": 9999
-        }],
+        "list": [
+            {
+                "ip": "127.0.0.1",
+                "port": 9999
+            }
+        ],
         "access": {
             "blackList": []
         },
@@ -198,7 +202,7 @@
     },
     "dapp": {
         "masterrequired": true,
-        "masterpassword": "",
+        "masterpassword": "c4Q3CgS9Rwkm",
         "autoexec": []
     },
     "nethash": "198f2b61a8eb95fbeed58b8216780b68f697f26b849acf00c8c93bb9b24f783d"

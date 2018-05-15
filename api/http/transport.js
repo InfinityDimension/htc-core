@@ -1,8 +1,8 @@
 'use strict';
 
-var Router = require('../helpers/router');
-var httpApi = require('../helpers/httpApi');
-var schema = require('../schema/transport');
+var Router = require('../../helpers/router');
+var httpApi = require('../../helpers/httpApi');
+var schema = require('../../schema/transport');
 
 /**
  * Binds api with modules and creates common url.
