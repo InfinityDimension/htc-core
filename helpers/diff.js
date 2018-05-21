@@ -1,15 +1,22 @@
+
+
 'use strict';
+
 /**
- * @memberof module:helpers
- * @module helpers/diff
+ * Description if the module.
+ *
+ * @module
+ * @todo Add description for the module
  */
 module.exports = {
 	/**
 	 * Changes operation sign.
+	 *
 	 * @param {Array} diff
-	 * @return {Array} reverse sign.
+	 * @returns {Array} Reverse sign
+	 * @todo Add description for the params
 	 */
-	reverse: function (diff) {
+	reverse(diff) {
 		var copyDiff = diff.slice();
 		for (var i = 0; i < copyDiff.length; i++) {
 			var math = copyDiff[i][0] === '-' ? '+' : '-';
@@ -20,11 +27,13 @@ module.exports = {
 
 	/**
 	 * Acts over source content adding(+) or deleting(-) public keys based on diff content.
+	 *
 	 * @param {Array} source
 	 * @param {Array} diff
-	 * @return {Array} Source data without -publicKeys and with +publicKeys from diff.
+	 * @returns {Array} Source data without -publicKeys and with +publicKeys from diff.
+	 * @todo Add description for the params
 	 */
-	merge: function (source, diff) {
+	merge(source, diff) {
 		var res = source ? source.slice() : [];
 		var index;
 
@@ -60,5 +69,5 @@ module.exports = {
 			}
 		}
 		return res;
-	}
+	},
 };

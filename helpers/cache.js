@@ -1,19 +1,29 @@
+
+
 'use strict';
 
 var redis = require('redis');
+/**
+ * Description of the module.
+ *
+ * @module
+ * @see Parent: {@link helpers}
+ */
 
 /**
- * Connects with redis server using the config provided via parameters
- * @param {Boolean} cacheEnabled
+ * Description of the function.
+ *
+ * @param {boolean} cacheEnabled
  * @param {Object} config - Redis configuration
  * @param {Object} logger
- * @param {Function} cb
+ * @param {function} cb
+ * @todo Add description for the function and the params
  */
-module.exports.connect = function (cacheEnabled, config, logger, cb) {
+module.exports.connect = function(cacheEnabled, config, logger, cb) {
 	var isRedisLoaded = false;
 
 	if (!cacheEnabled) {
-		return cb(null, { cacheEnabled: cacheEnabled, client: null });
+		return cb(null, { cacheEnabled, client: null });
 	}
 
 	// delete password key if it's value is null
@@ -22,21 +32,22 @@ module.exports.connect = function (cacheEnabled, config, logger, cb) {
 	}
 	var client = redis.createClient(config);
 
-	client.on('ready', function () {
+	client.on('ready', () => {
 		logger.info('App connected with redis server');
 
 		if (!isRedisLoaded) {
 			isRedisLoaded = true;
-			return cb(null, { cacheEnabled: cacheEnabled, client: client });
+			return cb(null, { cacheEnabled, client });
 		}
 	});
 
-	client.on('error', function (err) {
+	client.on('error', err => {
 		logger.error('Redis:', err);
-		// Only throw an error if cache was enabled in config but were unable to load it properly
+		// Returns redis client so application can continue to try to connect with the redis server,
+		// and modules/cache can have client reference once it's connected
 		if (!isRedisLoaded) {
 			isRedisLoaded = true;
-			return cb(null, { cacheEnabled: cacheEnabled, client: null });
+			return cb(null, { cacheEnabled, client });
 		}
 	});
 };

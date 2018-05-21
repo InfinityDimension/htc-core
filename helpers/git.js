@@ -1,30 +1,44 @@
+
+
 'use strict';
-/*
-* Helper module for parsing git commit information
-*
-* @class git.js
-*/
 
 var childProcess = require('child_process');
+var fs = require('fs');
 
 /**
- * Return hash of last git commit if available
- * @memberof module:helpers
- * @function
- * @return {String} Hash of last git commit
- * @throws {Error} Throws error if cannot get last git commit
+ * Helper module for parsing git commit information.
+ *
+ * @module
+ * @see Parent: {@link helpers}
+ * @requires child_process
  */
-function getLastCommit () {
+
+/**
+ * Returns hash of the last git commit if available.
+ *
+ * @returns {string} Hash of last git commit
+ * @throws {Error} If cannot get last git commit
+ */
+function getLastCommit() {
 	var spawn = childProcess.spawnSync('git', ['rev-parse', 'HEAD']);
 	var err = spawn.stderr.toString().trim();
 
-	if (err) {
-		throw new Error(err);
-	} else {
+	// If there is git tool available and current directory is a git owned directory
+	if (!err) {
 		return spawn.stdout.toString().trim();
+	}
+
+	// Try looking for a file REVISION for a compiled build
+	try {
+		return fs
+			.readFileSync('REVISION')
+			.toString()
+			.trim();
+	} catch (error) {
+		throw new Error('Not a git repository and no revision file found.');
 	}
 }
 
 module.exports = {
-	getLastCommit: getLastCommit
+	getLastCommit,
 };
